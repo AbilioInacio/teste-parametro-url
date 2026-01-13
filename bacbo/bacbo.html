@@ -1,377 +1,549 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bac Bo Style - Sorteio</title>
     <style>
-        :root {
-            --blue-main: #1a468e;
-            --red-main: #8b1a1a;
-            --gold-main: #b8860b;
-            --bg-dark: #0f0f0f;
-            --win-color: #00ff00;
-            --loss-color: #ff3333;
-        }
+      :root {
+        --blue-main: #1a468e;
+        --red-main: #8b1a1a;
+        --gold-main: #b8860b;
+        --bg-dark: #0f0f0f;
+        --win-color: #00ff00;
+        --loss-color: #ff3333;
+      }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-dark);
+        color: white;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
 
-        /* --- MODAL INICIAL --- */
-        #modal-login {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
+      /* --- MODAL INICIAL --- */
+      #modal-login {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
 
-        .modal-content {
-            background: #1a1a1a;
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid var(--gold-main);
-            text-align: center;
-            width: 300px;
-            box-shadow: 0 0 30px rgba(184, 134, 11, 0.3);
-        }
+      .modal-content {
+        background: #1a1a1a;
+        padding: 30px;
+        border-radius: 15px;
+        border: 2px solid var(--gold-main);
+        text-align: center;
+        width: 300px;
+        box-shadow: 0 0 30px rgba(184, 134, 11, 0.3);
+      }
 
-        .modal-content h2 { color: var(--gold-main); margin-bottom: 20px; }
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: #333;
-            border: 1px solid #555;
-            color: white;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
+      .modal-content h2 {
+        color: var(--gold-main);
+        margin-bottom: 20px;
+      }
+      .modal-content input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        background: #333;
+        border: 1px solid #555;
+        color: white;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
 
-        .modal-content button {
-            width: 100%;
-            padding: 12px;
-            background: var(--gold-main);
-            border: none;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 15px;
-            transition: 0.3s;
-        }
+      .modal-content button {
+        width: 100%;
+        padding: 12px;
+        background: var(--gold-main);
+        border: none;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 15px;
+        transition: 0.3s;
+      }
 
-        .modal-content button:hover { background: #daa520; }
+      .modal-content button:hover {
+        background: #daa520;
+      }
 
-        /* --- SEÇÃO SUPERIOR --- */
-        .top-section {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background: radial-gradient(circle, #2c2c2c 0%, #000 100%);
-            position: relative;
-        }
+      /* --- SEÇÃO SUPERIOR --- */
+      .top-section {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: radial-gradient(circle, #2c2c2c 0%, #000 100%);
+        position: relative;
+      }
 
-        .score-board {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--gold-main);
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            min-width: 150px;
-            z-index: 10;
-        }
+      .score-board {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid var(--gold-main);
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: bold;
+        min-width: 150px;
+        z-index: 10;
+      }
 
-        .user-info {
-            color: var(--gold-main);
-            border-bottom: 1px solid #444;
-            padding-bottom: 5px;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+      .user-info {
+        color: var(--gold-main);
+        border-bottom: 1px solid #444;
+        padding-bottom: 5px;
+        margin-bottom: 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-        .score-line { display: flex; justify-content: space-between; margin: 3px 0; }
-        .score-win { color: var(--win-color); }
-        .score-loss { color: var(--loss-color); }
+      .score-line {
+        display: flex;
+        justify-content: space-between;
+        margin: 3px 0;
+      }
+      .score-win {
+        color: var(--win-color);
+      }
+      .score-loss {
+        color: var(--loss-color);
+      }
 
-        .timer-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-        }
+      .timer-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+      }
 
-        #timer-svg circle { fill: none; stroke-width: 5; stroke: #444; }
-        #timer-svg #progress {
-            stroke: var(--win-color);
-            stroke-dasharray: 157;
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 1s linear;
-        }
+      #timer-svg circle {
+        fill: none;
+        stroke-width: 5;
+        stroke: #444;
+      }
+      #timer-svg #progress {
+        stroke: var(--win-color);
+        stroke-dasharray: 157;
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 1s linear;
+      }
 
-        .timer-text {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem; font-weight: bold;
-        }
+      .timer-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
 
-        /* --- DADOS 3D --- */
-        .dice-group { display: flex; gap: 20px; perspective: 600px; }
-        .dice-container { text-align: center; }
-        .dice {
-            width: 60px; height: 60px; position: relative;
-            transform-style: preserve-3d; transition: transform 1.5s ease-out;
-        }
-        .dice div {
-            position: absolute; width: 60px; height: 60px;
-            background: white; border: 1px solid #ccc; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; color: black;
-        }
-        .blue-dice div { background: #e3f2fd; color: var(--blue-main); }
-        .red-dice div { background: #ffebee; color: var(--red-main); }
+      /* --- DADOS 3D --- */
+      .dice-group {
+        display: flex;
+        gap: 20px;
+        perspective: 600px;
+      }
+      .dice-container {
+        text-align: center;
+      }
+      .dice {
+        width: 60px;
+        height: 60px;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 1.5s ease-out;
+      }
+      .dice div {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: black;
+      }
+      .blue-dice div {
+        background: #e3f2fd;
+        color: var(--blue-main);
+      }
+      .red-dice div {
+        background: #ffebee;
+        color: var(--red-main);
+      }
 
-        .face1 { transform: translateZ(30px); }
-        .face2 { transform: rotateY(180deg) translateZ(30px); }
-        .face3 { transform: rotateY(90deg) translateZ(30px); }
-        .face4 { transform: rotateY(-90deg) translateZ(30px); }
-        .face5 { transform: rotateX(90deg) translateZ(30px); }
-        .face6 { transform: rotateX(-90deg) translateZ(30px); }
+      .face1 {
+        transform: translateZ(30px);
+      }
+      .face2 {
+        transform: rotateY(180deg) translateZ(30px);
+      }
+      .face3 {
+        transform: rotateY(90deg) translateZ(30px);
+      }
+      .face4 {
+        transform: rotateY(-90deg) translateZ(30px);
+      }
+      .face5 {
+        transform: rotateX(90deg) translateZ(30px);
+      }
+      .face6 {
+        transform: rotateX(-90deg) translateZ(30px);
+      }
 
-        /* --- SEÇÃO CENTRAL --- */
-        .center-section {
-            width: 100%; max-width: 500px; padding: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: relative; height: 200px;
-        }
-        .bet-option {
-            flex: 1; height: 140px; margin: 5px; border-radius: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; border: 2px solid transparent; z-index: 1;
-        }
-        .option-blue { background: linear-gradient(135deg, #1e3c72, #2a5298); border-bottom: 5px solid #0d2a5a; }
-        .option-red { background: linear-gradient(135deg, #8b0000, #b22222); border-bottom: 5px solid #5a0000; }
-        .option-yellow { 
-            background: linear-gradient(135deg, #b8860b, #daa520); 
-            width: 110px; height: 110px; border-radius: 50%; 
-            position: absolute; left: 50%; transform: translateX(-50%);
-            z-index: 2; border: 4px solid #ffd700;
-        }
-        .bet-option.selected { border: 3px solid var(--win-color); transform: scale(1.05); box-shadow: 0 0 15px var(--win-color); }
+      /* --- SEÇÃO CENTRAL --- */
+      .center-section {
+        width: 100%;
+        max-width: 500px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        height: 200px;
+      }
+      .bet-option {
+        flex: 1;
+        height: 140px;
+        margin: 5px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.3s;
+        border: 2px solid transparent;
+        z-index: 1;
+      }
+      .option-blue {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        border-bottom: 5px solid #0d2a5a;
+      }
+      .option-red {
+        background: linear-gradient(135deg, #8b0000, #b22222);
+        border-bottom: 5px solid #5a0000;
+      }
+      .option-yellow {
+        background: linear-gradient(135deg, #b8860b, #daa520);
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        border: 4px solid #ffd700;
+      }
+      .bet-option.selected {
+        border: 3px solid var(--win-color);
+        transform: scale(1.05);
+        box-shadow: 0 0 15px var(--win-color);
+      }
 
-        /* --- HISTÓRICO --- */
-        .bottom-section { width: 100%; background: rgba(255,255,255,0.05); padding: 10px; overflow-x: auto; }
-        .history-grid { display: grid; grid-template-rows: repeat(6, 25px); grid-auto-flow: column; gap: 5px; height: 180px; }
-        .history-item { width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
-        .hist-blue { background: var(--blue-main); }
-        .hist-red { background: var(--red-main); }
-        .hist-yellow { background: var(--gold-main); }
+      /* --- HISTÓRICO --- */
+      .bottom-section {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px;
+        overflow-x: auto;
+      }
+      .history-grid {
+        display: grid;
+        grid-template-rows: repeat(6, 25px);
+        grid-auto-flow: column;
+        gap: 5px;
+        height: 180px;
+      }
+      .history-item {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+      }
+      .hist-blue {
+        background: var(--blue-main);
+      }
+      .hist-red {
+        background: var(--red-main);
+      }
+      .hist-yellow {
+        background: var(--gold-main);
+      }
 
-        .status-msg { padding: 10px; font-weight: bold; color: #ffd700; height: 20px; }
+      .status-msg {
+        padding: 10px;
+        font-weight: bold;
+        color: #ffd700;
+        height: 20px;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- MODAL DE ENTRADA -->
     <div id="modal-login">
-        <form class="modal-content" onsubmit="startGame(event)">
-            <h2>LOGIN</h2>
-            <input type="text" id="input-nome" placeholder="Nome de usuário" required>
-            <input type="email" id="input-email" placeholder="E-mail" required>
-            <button type="submit">ENTRAR E JOGAR</button>
-        </form>
+      <form class="modal-content" onsubmit="startGame(event)">
+        <h2>LOGIN</h2>
+        <input
+          type="text"
+          id="input-nome"
+          placeholder="Nome de usuário"
+          required
+        />
+        <input type="email" id="input-email" placeholder="E-mail" required />
+        <button type="submit">ENTRAR E JOGAR</button>
+      </form>
     </div>
 
     <div class="top-section">
-        <div class="score-board">
-            <div id="display-user" class="user-info">JOGADOR: ---</div>
-            <div class="score-line">Vitórias: <span id="win-count" class="score-win">0</span></div>
-            <div class="score-line">Derrotas: <span id="loss-count" class="score-loss">0</span></div>
+      <div class="score-board">
+        <div id="display-user" class="user-info">JOGADOR: ---</div>
+        <div class="score-line">
+          Vitórias: <span id="win-count" class="score-win">0</span>
+        </div>
+        <div class="score-line">
+          Derrotas: <span id="loss-count" class="score-loss">0</span>
+        </div>
+      </div>
+
+      <div class="timer-container">
+        <svg id="timer-svg" width="60" height="60">
+          <circle cx="30" cy="30" r="25"></circle>
+          <circle id="progress" cx="30" cy="30" r="25"></circle>
+        </svg>
+        <div class="timer-text" id="seconds">12</div>
+      </div>
+
+      <div class="dice-group">
+        <div class="dice-container">
+          <div id="dice-blue-1" class="dice blue-dice">
+            <div class="face1">1</div>
+            <div class="face2">2</div>
+            <div class="face3">3</div>
+            <div class="face4">4</div>
+            <div class="face5">5</div>
+            <div class="face6">6</div>
+          </div>
+          <div id="dice-blue-2" class="dice blue-dice" style="margin-top: 10px">
+            <div class="face1">1</div>
+            <div class="face2">2</div>
+            <div class="face3">3</div>
+            <div class="face4">4</div>
+            <div class="face5">5</div>
+            <div class="face6">6</div>
+          </div>
+          <div style="color: #2a5298; font-weight: bold; margin-top: 5px">
+            SOMA: <span id="sum-blue">0</span>
+          </div>
         </div>
 
-        <div class="timer-container">
-            <svg id="timer-svg" width="60" height="60">
-                <circle cx="30" cy="30" r="25"></circle>
-                <circle id="progress" cx="30" cy="30" r="25"></circle>
-            </svg>
-            <div class="timer-text" id="seconds">12</div>
+        <div class="dice-container">
+          <div id="dice-red-1" class="dice red-dice">
+            <div class="face1">1</div>
+            <div class="face2">2</div>
+            <div class="face3">3</div>
+            <div class="face4">4</div>
+            <div class="face5">5</div>
+            <div class="face6">6</div>
+          </div>
+          <div id="dice-red-2" class="dice red-dice" style="margin-top: 10px">
+            <div class="face1">1</div>
+            <div class="face2">2</div>
+            <div class="face3">3</div>
+            <div class="face4">4</div>
+            <div class="face5">5</div>
+            <div class="face6">6</div>
+          </div>
+          <div style="color: #b22222; font-weight: bold; margin-top: 5px">
+            SOMA: <span id="sum-red">0</span>
+          </div>
         </div>
-
-        <div class="dice-group">
-            <div class="dice-container">
-                <div id="dice-blue-1" class="dice blue-dice">
-                    <div class="face1">1</div><div class="face2">2</div><div class="face3">3</div><div class="face4">4</div><div class="face5">5</div><div class="face6">6</div>
-                </div>
-                <div id="dice-blue-2" class="dice blue-dice" style="margin-top:10px">
-                    <div class="face1">1</div><div class="face2">2</div><div class="face3">3</div><div class="face4">4</div><div class="face5">5</div><div class="face6">6</div>
-                </div>
-                <div style="color:#2a5298; font-weight:bold; margin-top:5px">SOMA: <span id="sum-blue">0</span></div>
-            </div>
-
-            <div class="dice-container">
-                <div id="dice-red-1" class="dice red-dice">
-                    <div class="face1">1</div><div class="face2">2</div><div class="face3">3</div><div class="face4">4</div><div class="face5">5</div><div class="face6">6</div>
-                </div>
-                <div id="dice-red-2" class="dice red-dice" style="margin-top:10px">
-                    <div class="face1">1</div><div class="face2">2</div><div class="face3">3</div><div class="face4">4</div><div class="face5">5</div><div class="face6">6</div>
-                </div>
-                <div style="color:#b22222; font-weight:bold; margin-top:5px">SOMA: <span id="sum-red">0</span></div>
-            </div>
-        </div>
+      </div>
     </div>
 
     <div id="status-display" class="status-msg">AGUARDANDO...</div>
 
     <div class="center-section">
-        <div class="bet-option option-blue" onclick="selectOption('blue', this)">
-            <span>1:1</span>
-            <h3>JOGADOR</h3>
-        </div>
-        <div class="bet-option option-yellow" onclick="selectOption('yellow', this)">
-            <span>88:1</span>
-            <h3>EMPATE</h3>
-        </div>
-        <div class="bet-option option-red" onclick="selectOption('red', this)">
-            <span>1:1</span>
-            <h3>BANCA</h3>
-        </div>
+      <div class="bet-option option-blue" onclick="selectOption('blue', this)">
+        <span>1:1</span>
+        <h3>JOGADOR</h3>
+      </div>
+      <div
+        class="bet-option option-yellow"
+        onclick="selectOption('yellow', this)"
+      >
+        <span>88:1</span>
+        <h3>EMPATE</h3>
+      </div>
+      <div class="bet-option option-red" onclick="selectOption('red', this)">
+        <span>1:1</span>
+        <h3>BANCA</h3>
+      </div>
     </div>
 
     <div class="bottom-section">
-        <div class="history-grid" id="history-container"></div>
+      <div class="history-grid" id="history-container"></div>
     </div>
 
     <script>
-        let timeLeft = 12;
-        let isBettingOpen = false; // Começa fechado até o login
-        let selectedColor = null;
-        let wins = 0;
-        let losses = 0;
+      let timeLeft = 12;
+      let isBettingOpen = false; // Começa fechado até o login
+      let selectedColor = null;
+      let wins = 0;
+      let losses = 0;
 
-        const rotations = { 1: '0,0', 2: '0,180', 3: '0,-90', 4: '0,90', 5: '-90,0', 6: '90,0' };
+      const rotations = {
+        1: "0,0",
+        2: "0,180",
+        3: "0,-90",
+        4: "0,90",
+        5: "-90,0",
+        6: "90,0",
+      };
 
-        // FUNÇÃO DE LOGIN
-        function startGame(event) {
-            event.preventDefault();
-            const nome = document.getElementById('input-nome').value;
-            const email = document.getElementById('input-email').value;
+      // FUNÇÃO DE LOGIN
+      function startGame(event) {
+        event.preventDefault();
+        const nome = document.getElementById("input-nome").value;
+        const email = document.getElementById("input-email").value;
 
-            if(nome && email) {
-                document.getElementById('display-user').innerText = `JOGADOR: ${nome}`;
-                document.getElementById('modal-login').style.display = 'none';
-                isBettingOpen = true;
-                initTimer();
+        if (nome && email) {
+          document.getElementById(
+            "display-user"
+          ).innerText = `JOGADOR: ${nome}`;
+          document.getElementById("modal-login").style.display = "none";
+          isBettingOpen = true;
+          initTimer();
+        }
+      }
+
+      function initTimer() {
+        const timerText = document.getElementById("seconds");
+        const progressCircle = document.getElementById("progress");
+        document.getElementById("status-display").innerText = "FAÇA SUA APOSTA";
+
+        const interval = setInterval(() => {
+          timeLeft--;
+          timerText.innerText = timeLeft;
+          progressCircle.style.strokeDashoffset = 157 - (157 * timeLeft) / 12;
+
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            startDraw();
+          }
+        }, 1000);
+      }
+
+      function selectOption(color, element) {
+        if (!isBettingOpen) return;
+        document
+          .querySelectorAll(".bet-option")
+          .forEach((el) => el.classList.remove("selected"));
+        element.classList.add("selected");
+        selectedColor = color;
+      }
+
+      function startDraw() {
+        isBettingOpen = false;
+        document.getElementById("status-display").innerText = "DADOS LANÇADOS!";
+
+        const b1 = Math.floor(Math.random() * 6) + 1;
+        const b2 = Math.floor(Math.random() * 6) + 1;
+        const r1 = Math.floor(Math.random() * 6) + 1;
+        const r2 = Math.floor(Math.random() * 6) + 1;
+
+        rollDice("dice-blue-1", b1);
+        rollDice("dice-blue-2", b2);
+        rollDice("dice-red-1", r1);
+        rollDice("dice-red-2", r2);
+
+        setTimeout(() => {
+          const sB = b1 + b2;
+          const sR = r1 + r2;
+          document.getElementById("sum-blue").innerText = sB;
+          document.getElementById("sum-red").innerText = sR;
+
+          let winColor = sB > sR ? "blue" : sR > sB ? "red" : "yellow";
+
+          // Atualiza Placar
+          if (selectedColor) {
+            if (selectedColor === winColor) {
+              wins++;
+            } else {
+              losses++;
             }
-        }
+            document.getElementById("win-count").innerText = wins;
+            document.getElementById("loss-count").innerText = losses;
+          }
 
-        function initTimer() {
-            const timerText = document.getElementById('seconds');
-            const progressCircle = document.getElementById('progress');
-            document.getElementById('status-display').innerText = "FAÇA SUA APOSTA";
-            
-            const interval = setInterval(() => {
-                timeLeft--;
-                timerText.innerText = timeLeft;
-                progressCircle.style.strokeDashoffset = 157 - (157 * timeLeft / 12);
+          document.getElementById("status-display").innerText =
+            winColor.toUpperCase() + " VENCEU!";
+          addToHistory(winColor, Math.max(sB, sR));
 
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    startDraw();
-                }
-            }, 1000);
-        }
+          setTimeout(resetGame, 500);
+        }, 1500);
+      }
 
-        function selectOption(color, element) {
-            if (!isBettingOpen) return;
-            document.querySelectorAll('.bet-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedColor = color;
-        }
+      function rollDice(id, val) {
+        const el = document.getElementById(id);
+        el.style.transform = `rotateX(${Math.random() * 1000}deg) rotateY(${
+          Math.random() * 1000
+        }deg)`;
+        setTimeout(() => {
+          const [x, y] = rotations[val].split(",");
+          el.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+        }, 500);
+      }
 
-        function startDraw() {
-            isBettingOpen = false;
-            document.getElementById('status-display').innerText = "DADOS LANÇADOS!";
-            
-            const b1 = Math.floor(Math.random() * 6) + 1;
-            const b2 = Math.floor(Math.random() * 6) + 1;
-            const r1 = Math.floor(Math.random() * 6) + 1;
-            const r2 = Math.floor(Math.random() * 6) + 1;
+      function addToHistory(color, val) {
+        const item = document.createElement("div");
+        item.className = `history-item hist-${color}`;
+        item.innerText = val;
+        document.getElementById("history-container").appendChild(item);
+      }
 
-            rollDice('dice-blue-1', b1); rollDice('dice-blue-2', b2);
-            rollDice('dice-red-1', r1); rollDice('dice-red-2', r2);
-
-            setTimeout(() => {
-                const sB = b1 + b2; const sR = r1 + r2;
-                document.getElementById('sum-blue').innerText = sB;
-                document.getElementById('sum-red').innerText = sR;
-                
-                let winColor = sB > sR ? 'blue' : (sR > sB ? 'red' : 'yellow');
-                
-                // Atualiza Placar
-                if (selectedColor) {
-                    if (selectedColor === winColor) { wins++; } 
-                    else { losses++; }
-                    document.getElementById('win-count').innerText = wins;
-                    document.getElementById('loss-count').innerText = losses;
-                }
-
-                document.getElementById('status-display').innerText = winColor.toUpperCase() + " VENCEU!";
-                addToHistory(winColor, Math.max(sB, sR));
-
-                setTimeout(resetGame, 3000);
-            }, 1500);
-        }
-
-        function rollDice(id, val) {
-            const el = document.getElementById(id);
-            el.style.transform = `rotateX(${Math.random()*1000}deg) rotateY(${Math.random()*1000}deg)`;
-            setTimeout(() => {
-                const [x, y] = rotations[val].split(',');
-                el.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
-            }, 500);
-        }
-
-        function addToHistory(color, val) {
-            const item = document.createElement('div');
-            item.className = `history-item hist-${color}`;
-            item.innerText = val;
-            document.getElementById('history-container').appendChild(item);
-        }
-
-        function resetGame() {
-            timeLeft = 12;
-            isBettingOpen = true;
-            selectedColor = null;
-            document.querySelectorAll('.bet-option').forEach(el => el.classList.remove('selected'));
-            document.getElementById('sum-blue').innerText = "0";
-            document.getElementById('sum-red').innerText = "0";
-            initTimer();
-        }
+      function resetGame() {
+        timeLeft = 12;
+        isBettingOpen = true;
+        selectedColor = null;
+        document
+          .querySelectorAll(".bet-option")
+          .forEach((el) => el.classList.remove("selected"));
+        document.getElementById("sum-blue").innerText = "0";
+        document.getElementById("sum-red").innerText = "0";
+        initTimer();
+      }
     </script>
-</body>
+  </body>
 </html>
