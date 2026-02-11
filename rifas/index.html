@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rifas HCRV - Hospital do Câncer de Rio Verde</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --hcrv-blue-dark: #0054a6;
+        --hcrv-blue-royal: #0072bc;
+        --hcrv-yellow: #ffcb05;
+        --hcrv-bg: #f4f7f9;
+        --gradient-start: #26a0d8;
+        --gradient-end: #e74f99;
+        --white: #ffffff;
+        --text-dark: #2c3e50;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body {
+        background-color: var(--hcrv-bg);
+        color: var(--text-dark);
+        min-height: 100vh;
+      }
+
+      /* HEADER COM GRADIENTE E LOGO TRANSPARENTE */
+      header {
+        background: linear-gradient(
+          90deg,
+          var(--gradient-start),
+          var(--gradient-end)
+        );
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-img {
+        height: 65px;
+        width: auto;
+        background: transparent; /* Garante fundo transparente */
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+      }
+      .nav-links a {
+        text-decoration: none;
+        color: var(--white);
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: 0.3s;
+      }
+      .nav-links a:hover {
+        color: var(--hcrv-yellow);
+      }
+
+      /* Botões */
+      .btn {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.3s;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+      .btn-auth {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid white;
+      }
+      .btn-auth:hover {
+        background: white;
+        color: var(--gradient-end);
+      }
+      .btn-primary {
+        background: var(--hcrv-blue-royal);
+        color: white;
+      }
+      .btn-yellow {
+        background: var(--hcrv-yellow);
+        color: var(--hcrv-blue-dark);
+      }
+
+      /* Grid de Rifas */
+      main {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .section-header {
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid var(--gradient-end);
+        padding-left: 15px;
+      }
+
+      .rifas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+      }
+      .card {
+        background: var(--white);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        transition: 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      .card-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+      .card-body {
+        padding: 20px;
+      }
+      .donor-info {
+        font-size: 0.7rem;
+        color: #7f8c8d;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .price-tag {
+        color: var(--gradient-end);
+        font-weight: 800;
+        font-size: 1.4rem;
+        margin: 10px 0;
+      }
+
+      /* Modal Seletor de Números */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        width: 95%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+      }
+
+      .number-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+        gap: 8px;
+        margin: 20px 0;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+      }
+      .n-item {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      .n-item.selected {
+        background: var(--gradient-end);
+        color: white;
+        border-color: var(--gradient-end);
+      }
+      .n-item.sold {
+        background: #e0e0e0;
+        color: #aaa;
+        cursor: not-allowed;
+        text-decoration: line-through;
+      }
+
+      /* Seção Bolão */
+      .bolao-box {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-top: 30px;
+      }
+      .bolao-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+      }
+
+      /* Login Box */
+      .login-box {
+        max-width: 380px;
+        text-align: center;
+      }
+      .login-box img {
+        height: 80px;
+        margin-bottom: 20px;
+      }
+      .input-group {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        .logo-img {
+          height: 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="logo-container">
+          <!-- Logo com fundo transparente conforme solicitado -->
+          <img
+            src="./assets/logo-hcrv.png"
+            alt="Hospital do Câncer Rio Verde"
+            class="logo-img"
+          />
+        </div>
+        <ul class="nav-links">
+          <li><a onclick="showSec('rifas')">Rifas</a></li>
+          <li><a onclick="showSec('bolao')">Bolões</a></li>
+          <li><a onclick="showSec('sobre')">O Hospital</a></li>
+          <li id="adm-link" style="display: none">
+            <a onclick="showSec('adm')">Gestão</a>
+          </li>
+        </ul>
+        <div id="auth-area">
+          <button class="btn btn-auth" onclick="openLogin()">
+            Entrar / Criar Conta
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- RIFAS -->
+      <section id="sec-rifas">
+        <div class="section-header">
+          <h2>Rifas Beneficentes</h2>
+          <p style="font-size: 0.8rem; color: #666">
+            Totalmente em prol do HCRV
+          </p>
+        </div>
+        <div class="rifas-grid">
+          <!-- Rifa 1 -->
+          <div class="card">
+            <img
+              src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=500"
+              class="card-img"
+            />
+            <div class="card-body">
+              <div class="donor-info">
+                <i class="fas fa-hand-holding-heart"></i> DOADOR: AgroForte Rio
+                Verde
+              </div>
+              <h3>Hilux SRX 0km</h3>
+              <p class="price-tag">R$ 100,00</p>
+              <button
+                class="btn btn-primary"
+                style="width: 100%"
+                onclick="openSel('Hilux SRX 0km', 100)"
+              >
+                Escolher Números
+              </button>
+            </div>
+          </div>
+          <!-- Rifa 2 -->
+          <div class="card">
+            <img
+              src="https://images.unsplash.com/photo-1596733430284-f7437764b1a9?auto=format&fit=crop&w=500"
+              class="card-img"
+            />
+            <div class="card-body">
+              <div class="donor-info">
+                <i class="fas fa-hand-holding-heart"></i> DOADOR: Nelore Premium
+                Gado
+              </div>
+              <h3>Touro Nelore PO</h3>
+              <p class="price-tag">R$ 50,00</p>
+              <button
+                class="btn btn-primary"
+                style="width: 100%"
+                onclick="openSel('Touro Nelore PO', 50)"
+              >
+                Escolher Números
+              </button>
+            </div>
+          </div>
+          <!-- Rifa 3 -->
+          <div class="card">
+            <img
+              src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500"
+              class="card-img"
+            />
+            <div class="card-body">
+              <div class="donor-info">
+                <i class="fas fa-hand-holding-heart"></i> DOADOR: Tech Store RV
+              </div>
+              <h3>iPhone 15 Pro Max</h3>
+              <p class="price-tag">R$ 30,00</p>
+              <button
+                class="btn btn-primary"
+                style="width: 100%"
+                onclick="openSel('iPhone 15 Pro Max', 30)"
+              >
+                Escolher Números
+              </button>
+            </div>
+          </div>
+          <!-- Rifa 4 -->
+          <div class="card">
+            <img
+              src="https://images.unsplash.com/photo-1556911220-e150213ff167?auto=format&fit=crop&w=500"
+              class="card-img"
+            />
+            <div class="card-body">
+              <div class="donor-info">
+                <i class="fas fa-hand-holding-heart"></i> DOADOR: Móveis Rio
+                Verde
+              </div>
+              <h3>Cozinha Planejada Completa</h3>
+              <p class="price-tag">R$ 25,00</p>
+              <button
+                class="btn btn-primary"
+                style="width: 100%"
+                onclick="openSel('Cozinha Planejada', 25)"
+              >
+                Escolher Números
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOLÃO -->
+      <section id="sec-bolao" style="display: none">
+        <div class="bolao-box">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h2>Bolões em Grupo</h2>
+            <button
+              class="btn btn-yellow"
+              onclick="checkAuth(() => alert('Criar seu grupo...'))"
+            >
+              Criar meu Grupo
+            </button>
+          </div>
+          <div class="bolao-item">
+            <div>
+              <strong>Amigos do Agro</strong><br /><small
+                >Rifa: Hilux | 12 pessoas</small
+              >
+            </div>
+            <button
+              class="btn btn-auth"
+              style="
+                color: var(--hcrv-blue-royal);
+                border-color: var(--hcrv-blue-royal);
+              "
+              onclick="checkAuth(() => alert('Entrou no grupo!'))"
+            >
+              Participar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOBRE -->
+      <section id="sec-sobre" style="display: none">
+        <div class="bolao-box" style="text-align: center">
+          <img
+            src="./assets/69738ce29dffd.webp"
+            style="height: 100px; margin-bottom: 20px"
+          />
+          <h2>Sua Ajuda é o que nos move</h2>
+          <p style="margin: 20px 0; line-height: 1.7">
+            O Hospital do Câncer de Rio Verde (HCRV) atende centenas de
+            pacientes mensalmente. Por ser filantrópico, as rifas e doações são
+            essenciais para manter o tratamento oncológico de ponta.
+          </p>
+          <button
+            class="btn btn-primary"
+            onclick="window.open('https://hcrv.org.br', '_blank')"
+          >
+            Ir para o Site Oficial do Hospital
+          </button>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="sec-adm" style="display: none">
+        <div class="bolao-box">
+          <h2>Painel Gestor HCRV</h2>
+          <p style="margin: 15px 0">Gerenciamento de vendas e novas rifas.</p>
+          <button class="btn btn-primary">Adicionar Nova Rifa</button>
+          <button
+            class="btn btn-auth"
+            style="
+              color: var(--text-dark);
+              border-color: #ccc;
+              margin-left: 10px;
+            "
+          >
+            Ver Vendas
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- MODAL SELETOR -->
+    <div id="modal-sel" class="modal">
+      <div class="modal-content">
+        <h2 id="m-title">Escolha seu Número</h2>
+        <div
+          style="
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <button class="btn btn-yellow" onclick="pickRandom()">
+            <i class="fas fa-random"></i> Número Aleatório
+          </button>
+          <p style="font-size: 0.7rem; color: #666; width: 50%">
+            O sistema escolherá um número da sorte disponível para você.
+          </p>
+        </div>
+        <div class="number-grid" id="grid"></div>
+        <div
+          style="
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <span id="m-count">0</span> selecionados<br />
+            <strong
+              id="m-total"
+              style="font-size: 1.4rem; color: var(--gradient-end)"
+              >R$ 0,00</strong
+            >
+          </div>
+          <button class="btn btn-primary" onclick="buy()">
+            Finalizar Compra
+          </button>
+        </div>
+        <button
+          onclick="closeModals()"
+          style="
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+          "
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL LOGIN -->
+    <div id="modal-login" class="modal">
+      <div class="modal-content login-box">
+        <img src="./assets/logo-hcrv.png" />
+        <h3>Acesse sua Conta</h3>
+        <input type="email" class="input-group" placeholder="E-mail" />
+        <input type="password" class="input-group" placeholder="Senha" />
+        <button
+          class="btn btn-primary"
+          style="width: 100%"
+          onclick="login('user')"
+        >
+          Entrar
+        </button>
+        <hr style="margin: 15px 0; opacity: 0.3" />
+        <button
+          class="btn btn-auth"
+          style="
+            width: 100%;
+            color: var(--hcrv-blue-dark);
+            border-color: var(--hcrv-blue-dark);
+          "
+          onclick="login('admin')"
+        >
+          Acesso Gestor
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let user = null;
+      let selected = [];
+      let pPrice = 0;
+
+      function showSec(id) {
+        ["rifas", "bolao", "sobre", "adm"].forEach((s) => {
+          const el = document.getElementById(`sec-${s}`);
+          if (el) el.style.display = s === id ? "block" : "none";
+        });
+      }
+
+      function openLogin() {
+        document.getElementById("modal-login").style.display = "flex";
+      }
+      function closeModals() {
+        document
+          .querySelectorAll(".modal")
+          .forEach((m) => (m.style.display = "none"));
+      }
+
+      function login(type) {
+        user = { type };
+        document.getElementById("auth-area").innerHTML = `
+            <span style="color:white; font-size:0.8rem; margin-right:10px;">Olá, ${
+              type === "admin" ? "Gestor" : "Doador"
+            }</span>
+            <button class="btn btn-auth" onclick="location.reload()">Sair</button>
+        `;
+        if (type === "admin")
+          document.getElementById("adm-link").style.display = "block";
+        closeModals();
+      }
+
+      function checkAuth(callback) {
+        if (!user) {
+          alert("Faça login para continuar");
+          openLogin();
+        } else callback();
+      }
+
+      function openSel(title, price) {
+        checkAuth(() => {
+          pPrice = price;
+          selected = [];
+          document.getElementById("m-title").innerText = title;
+          const grid = document.getElementById("grid");
+          grid.innerHTML = "";
+          for (let i = 1; i <= 100; i++) {
+            const n = document.createElement("div");
+            n.className =
+              "n-item" + ([4, 15, 28, 40, 77].includes(i) ? " sold" : "");
+            n.innerText = i.toString().padStart(2, "0");
+            if (!n.className.includes("sold"))
+              n.onclick = () => {
+                if (selected.includes(i)) {
+                  selected = selected.filter((x) => x !== i);
+                  n.classList.remove("selected");
+                } else {
+                  selected.push(i);
+                  n.classList.add("selected");
+                }
+                updateTotal();
+              };
+            grid.appendChild(n);
+          }
+          document.getElementById("modal-sel").style.display = "flex";
+          updateTotal();
+        });
+      }
+
+      function updateTotal() {
+        document.getElementById("m-count").innerText = selected.length;
+        document.getElementById("m-total").innerText = `R$ ${(
+          selected.length * pPrice
+        ).toFixed(2)}`;
+      }
+
+      function pickRandom() {
+        const avail = document.querySelectorAll(".n-item:not(.sold)");
+        avail[Math.floor(Math.random() * avail.length)].click();
+      }
+
+      function buy() {
+        if (selected.length === 0) return alert("Selecione um número!");
+        alert("Reserva confirmada! Redirecionando para o pagamento...");
+        closeModals();
+      }
+    </script>
+  </body>
+</html>
