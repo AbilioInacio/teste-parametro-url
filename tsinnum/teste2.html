@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>TSINNUM - Mobile & Tablet</title>
+    <style>
+      :root {
+        --bg-dark: #121212;
+        --square-light: #d1d1d1;
+        --square-dark: #4b7399;
+        --highlight: rgba(255, 235, 59, 0.6);
+        --selected: rgba(76, 175, 80, 0.8);
+        --board-size: 95vw; /* Padrão mobile */
+        --max-board-desktop: 650px;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: var(--bg-dark);
+        color: white;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* LAYOUT PRINCIPAL */
+      #game-wrapper {
+        display: flex;
+        flex-direction: column; /* Empilhado no mobile */
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        width: 100%;
+        max-width: 1200px;
+      }
+
+      h1 {
+        margin: 10px 0;
+        font-size: 1.5rem;
+        color: var(--square-dark);
+      }
+
+      /* TABULEIRO RESPONSIVO */
+      #board-container {
+        position: relative;
+        width: var(--board-size);
+        height: var(--board-size);
+        max-width: var(--max-board-desktop);
+        max-height: var(--max-board-desktop);
+      }
+
+      #board-grid {
+        display: grid;
+        grid-template-columns: 20px repeat(12, 1fr) 20px;
+        grid-template-rows: 20px repeat(12, 1fr) 20px;
+        width: 100%;
+        height: 100%;
+        border: 4px solid #333;
+        background: #222;
+      }
+
+      .square {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        touch-action: manipulation;
+      }
+
+      .square.light {
+        background-color: var(--square-light);
+      }
+      .square.dark {
+        background-color: var(--square-dark);
+      }
+      .square.selected {
+        background-color: var(--selected) !important;
+      }
+
+      /* Indicador de movimento possível */
+      .square.highlight::after {
+        content: "";
+        width: 30%;
+        height: 30%;
+        background: var(--highlight);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .coord {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 9px;
+        font-weight: bold;
+        color: #888;
+        background: #1a1a1a;
+      }
+
+      /* PEÇAS */
+      .piece {
+        width: 90%;
+        height: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: clamp(14px, 4vw, 35px);
+        z-index: 10;
+        user-select: none;
+        transition: transform 0.1s;
+      }
+      .piece.white {
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+      }
+      .piece.black {
+        color: #000;
+        text-shadow: 0px 0px 1px #fff;
+      }
+
+      /* PAINEL LATERAL / INFERIOR */
+      #side-panel {
+        width: 100%;
+        max-width: var(--max-board-desktop);
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .turn-box {
+        grid-column: span 2;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        border-radius: 5px;
+        text-transform: uppercase;
+      }
+      .white-turn {
+        background: #eee;
+        color: #000;
+      }
+      .black-turn {
+        background: #333;
+        color: #fff;
+        border: 1px solid #555;
+      }
+
+      .player-info {
+        font-size: 0.9rem;
+      }
+      .status-msg {
+        grid-column: span 2;
+        color: #aaa;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+
+      /* MODAL RESPONSIVO */
+      #modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        padding: 20px;
+      }
+
+      .modal {
+        background: #1e272e;
+        padding: 25px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        border: 2px solid var(--square-dark);
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: none;
+        background: #2d3436;
+        color: white;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+        background: var(--square-dark);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        margin-top: 15px;
+      }
+
+      /* MEDIA QUERIES PARA TABLET E DESKTOP */
+      @media (min-width: 900px) {
+        #game-wrapper {
+          flex-direction: row;
+          justify-content: center;
+          padding-top: 40px;
+        }
+        #side-panel {
+          width: 300px;
+          grid-template-columns: 1fr;
+        }
+        .turn-box,
+        .status-msg {
+          grid-column: span 1;
+        }
+        h1 {
+          position: absolute;
+          top: 10px;
+        }
+        --board-size: 600px;
+        .coord {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="modal-overlay">
+      <div class="modal">
+        <h2 style="color: var(--square-dark)">TSINNUM</h2>
+        <p>A Batalha Mitológica</p>
+        <input
+          type="text"
+          id="p-white"
+          placeholder="Nome: Brancas"
+          value="Brancas"
+        />
+        <input
+          type="text"
+          id="p-black"
+          placeholder="Nome: Pretas"
+          value="Negras"
+        />
+        <button onclick="startGame()">INICIAR JOGO</button>
+      </div>
+    </div>
+
+    <h1>TSINNUM</h1>
+
+    <div id="game-wrapper">
+      <div id="board-container">
+        <div id="board-grid"></div>
+      </div>
+
+      <div id="side-panel">
+        <div id="turn-display" class="turn-box white-turn">Turno: Brancas</div>
+        <div class="player-info">⚪ <span id="n-w">-</span></div>
+        <div class="player-info">⚫ <span id="n-b">-</span></div>
+        <div id="status" class="status-msg">
+          Selecione uma peça para começar
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const boardEl = document.getElementById("board-grid");
+      const statusEl = document.getElementById("status");
+      let currentPlayer = "white";
+      let selected = null;
+      let validMoves = [];
+      let gameState = Array(12)
+        .fill(null)
+        .map(() => Array(12).fill(null));
+
+      const pieces = {
+        king: "♔",
+        queen: "♕",
+        rook: "♖",
+        bishop: "♗",
+        knight: "♘",
+        pawn: "♙",
+        prin: "Pr",
+        pegaso: "Pg",
+        minotauro: "Mi",
+        unicornio: "Un",
+        centauro: "Ce",
+        fauno: "Fa",
+        senhor: "Se",
+      };
+
+      function startGame() {
+        document.getElementById("n-w").innerText =
+          document.getElementById("p-white").value;
+        document.getElementById("n-b").innerText =
+          document.getElementById("p-black").value;
+        document.getElementById("modal-overlay").style.display = "none";
+        initSetup();
+        render();
+      }
+
+      function initSetup() {
+        const line1 = [
+          "rook",
+          "knight",
+          "pegaso",
+          "minotauro",
+          "bishop",
+          "queen",
+          "king",
+          "bishop",
+          "minotauro",
+          "pegaso",
+          "knight",
+          "rook",
+        ];
+        const line2 = [
+          "senhor",
+          "senhor",
+          "senhor",
+          "centauro",
+          "unicornio",
+          "fauno",
+          "prin",
+          "unicornio",
+          "centauro",
+          "senhor",
+          "senhor",
+          "senhor",
+        ];
+
+        for (let i = 0; i < 12; i++) {
+          // Brancas
+          gameState[0][i] = { type: line1[i], color: "white" };
+          gameState[1][i] = { type: line2[i], color: "white" };
+          gameState[2][i] = { type: "pawn", color: "white" };
+          // Negras
+          gameState[11][i] = { type: line1[i], color: "black" };
+          gameState[10][i] = { type: line2[i], color: "black" };
+          gameState[9][i] = { type: "pawn", color: "black" };
+        }
+      }
+
+      function render() {
+        boardEl.innerHTML = "";
+
+        // Coords Topo
+        boardEl.appendChild(createCoord(""));
+        for (let i = 0; i < 12; i++)
+          boardEl.appendChild(createCoord(String.fromCharCode(97 + i)));
+        boardEl.appendChild(createCoord(""));
+
+        for (let r = 11; r >= 0; r--) {
+          boardEl.appendChild(createCoord(r + 1));
+          for (let c = 0; c < 12; c++) {
+            const sq = document.createElement("div");
+            sq.className = `square ${(r + c) % 2 ? "light" : "dark"}`;
+
+            if (selected && selected.r === r && selected.c === c)
+              sq.classList.add("selected");
+            if (validMoves.some((m) => m.r === r && m.c === c))
+              sq.classList.add("highlight");
+
+            const p = gameState[r][c];
+            if (p) {
+              const pEl = document.createElement("div");
+              pEl.className = `piece ${p.color}`;
+              pEl.innerText = pieces[p.type];
+              sq.appendChild(pEl);
+            }
+
+            sq.onclick = () => handleInput(r, c);
+            boardEl.appendChild(sq);
+          }
+          boardEl.appendChild(createCoord(r + 1));
+        }
+
+        // Coords Base
+        boardEl.appendChild(createCoord(""));
+        for (let i = 0; i < 12; i++)
+          boardEl.appendChild(createCoord(String.fromCharCode(97 + i)));
+        boardEl.appendChild(createCoord(""));
+      }
+
+      function handleInput(r, c) {
+        const clicked = gameState[r][c];
+
+        // Se clicou em movimento válido
+        if (validMoves.some((m) => m.r === r && m.c === c)) {
+          movePiece(selected.r, selected.c, r, c);
+          return;
+        }
+
+        // Seleção de peça
+        if (clicked && clicked.color === currentPlayer) {
+          selected = { r, c };
+          validMoves = calculateMoves(r, c, clicked);
+          statusEl.innerText = `Movendo ${clicked.type}...`;
+        } else {
+          selected = null;
+          validMoves = [];
+          statusEl.innerText = `Turno das ${
+            currentPlayer === "white" ? "Brancas" : "Pretas"
+          }`;
+        }
+        render();
+      }
+
+      function movePiece(fr, fc, tr, tc) {
+        gameState[tr][tc] = gameState[fr][fc];
+        gameState[fr][fc] = null;
+
+        currentPlayer = currentPlayer === "white" ? "black" : "white";
+        const display = document.getElementById("turn-display");
+        display.innerText = `Turno: ${
+          currentPlayer === "white" ? "Brancas" : "Pretas"
+        }`;
+        display.className = `turn-box ${currentPlayer}-turn`;
+
+        selected = null;
+        validMoves = [];
+        render();
+      }
+
+      function calculateMoves(r, c, p) {
+        let m = [];
+        const add = (nr, nc) => {
+          if (nr < 0 || nr >= 12 || nc < 0 || nc >= 12) return false;
+          if (!gameState[nr][nc]) {
+            m.push({ r: nr, c: nc });
+            return true;
+          }
+          if (gameState[nr][nc].color !== p.color) {
+            m.push({ r: nr, c: nc });
+            return false;
+          }
+          return false;
+        };
+
+        const slide = (dirs) => {
+          dirs.forEach((d) => {
+            let nr = r + d[0],
+              nc = c + d[1];
+            while (nr >= 0 && nr < 12 && nc >= 0 && nc < 12) {
+              if (!gameState[nr][nc]) m.push({ r: nr, c: nc });
+              else {
+                if (gameState[nr][nc].color !== p.color)
+                  m.push({ r: nr, c: nc });
+                break;
+              }
+              nr += d[0];
+              nc += d[1];
+            }
+          });
+        };
+
+        const horse = [
+          [2, 1],
+          [2, -1],
+          [-2, 1],
+          [-2, -1],
+          [1, 2],
+          [1, -2],
+          [-1, 2],
+          [-1, -2],
+        ];
+        const diag = [
+          [1, 1],
+          [1, -1],
+          [-1, 1],
+          [-1, -1],
+        ];
+        const rect = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+
+        switch (p.type) {
+          case "king":
+            [...diag, ...rect].forEach((v) => add(r + v[0], c + v[1]));
+            break;
+          case "queen":
+            slide([...diag, ...rect]);
+            break;
+          case "rook":
+            slide(rect);
+            break;
+          case "bishop":
+            slide(diag);
+            break;
+          case "knight":
+            horse.forEach((v) => add(r + v[0], c + v[1]));
+            break;
+          case "pawn":
+            let d = p.color === "white" ? 1 : -1;
+            if (add(r + d, c)) {
+              // Simples frente
+              if (
+                (p.color === "white" && r === 2) ||
+                (p.color === "black" && r === 9)
+              )
+                add(r + d * 2, c);
+            }
+            // Captura diagonal simplificada
+            [
+              [d, 1],
+              [d, -1],
+            ].forEach((v) => {
+              let nr = r + v[0],
+                nc = c + v[1];
+              if (
+                nr >= 0 &&
+                nr < 12 &&
+                nc >= 0 &&
+                nc < 12 &&
+                gameState[nr][nc] &&
+                gameState[nr][nc].color !== p.color
+              )
+                m.push({ r: nr, c: nc });
+            });
+            break;
+          case "prin":
+            slide([...diag, ...rect]);
+            horse.forEach((v) => add(r + v[0], c + v[1]));
+            break;
+          case "pegaso": // Salto 3+2 + Cavalo + 1 Diag
+            [
+              [3, 2],
+              [3, -2],
+              [-3, 2],
+              [-3, -2],
+              [2, 3],
+              [2, -3],
+              [-2, 3],
+              [-2, -3],
+              ...horse,
+              ...diag,
+            ].forEach((v) => add(r + v[0], c + v[1]));
+            break;
+          case "minotauro": // Salto 3+2 (90º) + 1 qq dir + Salto linear 2
+            [
+              [3, 2],
+              [-3, 2],
+              [3, -2],
+              [-3, -2],
+              ...diag,
+              ...rect,
+              [2, 0],
+              [-2, 0],
+              [0, 2],
+              [0, -2],
+            ].forEach((v) => add(r + v[0], c + v[1]));
+            break;
+          case "senhor": // 1 frente/atras + captura diag
+            add(r + 1, c);
+            add(r - 1, c);
+            diag.forEach((v) => {
+              let nr = r + v[0],
+                nc = c + v[1];
+              if (
+                nr >= 0 &&
+                nr < 12 &&
+                nc >= 0 &&
+                nc < 12 &&
+                gameState[nr][nc] &&
+                gameState[nr][nc].color !== p.color
+              )
+                m.push({ r: nr, c: nc });
+            });
+            break;
+          default: // Outras místicas (Simplificado para o exemplo)
+            horse.forEach((v) => add(r + v[0], c + v[1]));
+        }
+        return m;
+      }
+
+      function createCoord(txt) {
+        const d = document.createElement("div");
+        d.className = "coord";
+        d.innerText = txt;
+        return d;
+      }
+    </script>
+  </body>
+</html>
