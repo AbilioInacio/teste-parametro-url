@@ -3,77 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Logic Master - Proposicional</title>
+    <title>Calculadora Lógica | AbilioDev</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div class="container">
-      <h1>Lógica Proposicional</h1>
+    <div class="main-wrapper">
+      <header>
+        <h1>Calculadora<span>Logica</span></h1>
+        <p>Simplificador e Gerador de Tabelas Verdade</p>
+      </header>
 
-      <!-- Seleção Inicial -->
-      <div id="setup-screen">
-        <h3>Escolha o modo de trabalho:</h3>
-        <div class="mode-buttons">
-          <button onclick="setMode('equation')">Trabalhar com Equação</button>
-          <button onclick="setMode('table')">
-            Trabalhar com Tabela Verdade
-          </button>
+      <main class="container">
+        <!-- Seleção Inicial -->
+        <section id="setup-screen" class="card">
+          <h3>Como deseja começar?</h3>
+          <div class="mode-grid">
+            <button class="btn-mode" onclick="setMode('equation')">
+              <span class="icon">fx</span>
+              Trabalhar com Equação
+            </button>
+            <button class="btn-mode" onclick="setMode('table')">
+              <span class="icon">⊞</span>
+              Tabela Verdade Inversa
+            </button>
+          </div>
+        </section>
+
+        <!-- Seleção de Variáveis -->
+        <section id="variable-selection" class="card hidden">
+          <h3>Configuração</h3>
+          <div class="input-group">
+            <label>Quantidade de variáveis (2-4):</label>
+            <input type="number" id="var-count" min="2" max="4" value="2" />
+          </div>
+          <div class="input-group">
+            <label>Exibição dos valores:</label>
+            <select id="display-format">
+              <option value="num">1 e 0</option>
+              <option value="alpha">V e F</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="initWorkspace()">Iniciar</button>
+        </section>
+
+        <!-- Workspace de Equação -->
+        <section id="equation-workspace" class="card hidden">
+          <div class="toolbar" id="vars-pool"></div>
+          <div class="toolbar operators">
+            <button class="btn-op" onclick="addToken('(')">(</button>
+            <button class="btn-op" onclick="addToken(')')">)</button>
+            <button class="btn-op" onclick="addToken('¬')">¬</button>
+            <button class="btn-op" onclick="addToken('∧')">∧</button>
+            <button class="btn-op" onclick="addToken('∨')">∨</button>
+            <button class="btn-op" onclick="addToken('⊕')">⊕</button>
+            <button class="btn-op" onclick="addToken('→')">→</button>
+            <button class="btn-op" onclick="addToken('↔')">↔</button>
+            <button class="btn-danger" onclick="clearEquation()">Limpar</button>
+          </div>
+
+          <div class="equation-view">
+            <label>Sua Equação:</label>
+            <div id="equation-display" class="tokens-container"></div>
+          </div>
+
+          <div class="actions-grid">
+            <button onclick="processLogic('table')">Gerar Tabela</button>
+            <button onclick="processLogic('simplify')">Simplificar</button>
+            <button onclick="processLogic('circuit')">Circuito</button>
+          </div>
+        </section>
+
+        <!-- Workspace de Tabela Verdade Inversa -->
+        <section id="table-workspace" class="card hidden">
+          <h3>Preencha os Resultados</h3>
+          <div class="table-responsive" id="manual-table-container"></div>
+          <div class="actions-grid">
+            <button onclick="generateFromTable('equation')">
+              Gerar Equação
+            </button>
+            <button onclick="generateFromTable('circuit')">
+              Gerar Circuito
+            </button>
+          </div>
+        </section>
+
+        <!-- Área de Resultados -->
+        <section id="result-area" class="card hidden">
+          <div class="result-header">
+            <h2>Resultado</h2>
+            <button class="btn-outline" onclick="reset()">Reiniciar</button>
+          </div>
+          <div id="result-content"></div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="footer-content">
+          <p>© 2026 Calculadora Lógica - Criado por Abílio Dev</p>
+          <div class="social-links">
+            <a
+              href="https://www.youtube.com/@abiliodev"
+              target="_blank"
+              class="btn-social yt"
+              >Visite o canal</a
+            >
+            <a
+              href="https://www.instagram.com/abilio.dev/"
+              target="_blank"
+              class="btn-social ig"
+              >Instagram</a
+            >
+          </div>
         </div>
-      </div>
-
-      <!-- Seleção de Variáveis -->
-      <div id="variable-selection" class="hidden">
-        <h3>Quantas variáveis (2 a 4)?</h3>
-        <input type="number" id="var-count" min="2" max="4" value="2" />
-        <button onclick="initWorkspace()">Confirmar</button>
-      </div>
-
-      <!-- Workspace de Equação -->
-      <div id="equation-workspace" class="hidden">
-        <div class="vars-display" id="vars-pool"></div>
-        <div class="operators-display">
-          <button onclick="addToken('(')">(</button>
-          <button onclick="addToken(')')">)</button>
-          <button onclick="addToken('¬')">¬ (Negação)</button>
-          <button onclick="addToken('∧')">∧ (Conjunção)</button>
-          <button onclick="addToken('∨')">∨ (Disjunção)</button>
-          <button onclick="addToken('⊕')">⊕ (XOR)</button>
-          <button onclick="addToken('→')">→ (Condicional)</button>
-          <button onclick="addToken('↔')">↔ (Bicondicional)</button>
-          <button class="btn-clear" onclick="clearEquation()">Limpar</button>
-        </div>
-
-        <div class="equation-builder" id="equation-display"></div>
-
-        <div class="actions">
-          <button onclick="processLogic('table')">Gerar Tabela Verdade</button>
-          <button onclick="processLogic('simplify')">Simplificar</button>
-          <button onclick="processLogic('circuit')">Circuito Lógico</button>
-        </div>
-      </div>
-
-      <!-- Workspace de Tabela Verdade Inversa -->
-      <div id="table-workspace" class="hidden">
-        <p>Preencha os resultados da coluna final:</p>
-        <div id="manual-table-container"></div>
-        <div class="actions">
-          <button onclick="generateFromTable('equation')">
-            Gerar Equação Otimizada
-          </button>
-          <button onclick="generateFromTable('circuit')">Gerar Circuito</button>
-        </div>
-      </div>
-
-      <!-- Área de Resultados -->
-      <div id="result-area" class="result-container hidden">
-        <div class="result-header">
-          <h2>Resultado</h2>
-          <button onclick="reset()">Voltar ao Início</button>
-        </div>
-        <div id="result-content"></div>
-      </div>
+      </footer>
     </div>
-
     <script src="script.js"></script>
   </body>
 </html>
