@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logic Master - Proposicional</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Lógica Proposicional</h1>
+
+      <!-- Seleção Inicial -->
+      <div id="setup-screen">
+        <h3>Escolha o modo de trabalho:</h3>
+        <div class="mode-buttons">
+          <button onclick="setMode('equation')">Trabalhar com Equação</button>
+          <button onclick="setMode('table')">
+            Trabalhar com Tabela Verdade
+          </button>
+        </div>
+      </div>
+
+      <!-- Seleção de Variáveis -->
+      <div id="variable-selection" class="hidden">
+        <h3>Quantas variáveis (2 a 4)?</h3>
+        <input type="number" id="var-count" min="2" max="4" value="2" />
+        <button onclick="initWorkspace()">Confirmar</button>
+      </div>
+
+      <!-- Workspace de Equação -->
+      <div id="equation-workspace" class="hidden">
+        <div class="vars-display" id="vars-pool"></div>
+        <div class="operators-display">
+          <button onclick="addToken('(')">(</button>
+          <button onclick="addToken(')')">)</button>
+          <button onclick="addToken('¬')">¬ (Negação)</button>
+          <button onclick="addToken('∧')">∧ (Conjunção)</button>
+          <button onclick="addToken('∨')">∨ (Disjunção)</button>
+          <button onclick="addToken('⊕')">⊕ (XOR)</button>
+          <button onclick="addToken('→')">→ (Condicional)</button>
+          <button onclick="addToken('↔')">↔ (Bicondicional)</button>
+          <button class="btn-clear" onclick="clearEquation()">Limpar</button>
+        </div>
+
+        <div class="equation-builder" id="equation-display"></div>
+
+        <div class="actions">
+          <button onclick="processLogic('table')">Gerar Tabela Verdade</button>
+          <button onclick="processLogic('simplify')">Simplificar</button>
+          <button onclick="processLogic('circuit')">Circuito Lógico</button>
+        </div>
+      </div>
+
+      <!-- Workspace de Tabela Verdade Inversa -->
+      <div id="table-workspace" class="hidden">
+        <p>Preencha os resultados da coluna final:</p>
+        <div id="manual-table-container"></div>
+        <div class="actions">
+          <button onclick="generateFromTable('equation')">
+            Gerar Equação Otimizada
+          </button>
+          <button onclick="generateFromTable('circuit')">Gerar Circuito</button>
+        </div>
+      </div>
+
+      <!-- Área de Resultados -->
+      <div id="result-area" class="result-container hidden">
+        <div class="result-header">
+          <h2>Resultado</h2>
+          <button onclick="reset()">Voltar ao Início</button>
+        </div>
+        <div id="result-content"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
