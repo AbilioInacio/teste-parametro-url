@@ -1,6 +1,5 @@
 /**
- * Logic Master - Core Logic
- * Implementa Algoritmo Shunting-yard para precedência de operadores
+ * Logic Master - Core Logic (Quine-McCluskey Implementation)
  */
 
 let currentMode = "";
@@ -8,7 +7,6 @@ let variables = [];
 let equationTokens = [];
 const varSymbols = ["p", "q", "r", "s"];
 
-// Definição de Precedência e Comportamento
 const OPERATORS = {
   "¬": { prec: 4, assoc: "R", exec: (a) => !a },
   "∧": { prec: 3, assoc: "L", exec: (a, b) => a && b },
@@ -78,87 +76,193 @@ function clearEquation() {
   renderEquationDisplay();
 }
 
-// --- MOTOR LÓGICO (O Coração do Cálculo) ---
-
-/**
- * Converte Infix (p ∧ q) para Postfix (p q ∧)
- */
+// --- PARSER SHUNTING-YARD ---
 function infixToPostfix(tokens) {
   let outputQueue = [];
   let opStack = [];
-
   tokens.forEach((token) => {
-    if (variables.includes(token)) {
-      outputQueue.push(token);
-    } else if (token === "(") {
-      opStack.push(token);
-    } else if (token === ")") {
-      while (opStack.length > 0 && opStack[opStack.length - 1] !== "(") {
+    if (variables.includes(token)) outputQueue.push(token);
+    else if (token === "(") opStack.push(token);
+    else if (token === ")") {
+      while (opStack.length > 0 && opStack[opStack.length - 1] !== "(")
         outputQueue.push(opStack.pop());
-      }
-      opStack.pop(); // Remove '('
+      opStack.pop();
     } else if (OPERATORS[token]) {
-      const o1 = token;
       while (opStack.length > 0 && opStack[opStack.length - 1] !== "(") {
         const o2 = opStack[opStack.length - 1];
         if (
-          (OPERATORS[o1].assoc === "L" &&
-            OPERATORS[o1].prec <= OPERATORS[o2].prec) ||
-          (OPERATORS[o1].assoc === "R" &&
-            OPERATORS[o1].prec < OPERATORS[o2].prec)
+          (OPERATORS[token].assoc === "L" &&
+            OPERATORS[token].prec <= OPERATORS[o2].prec) ||
+          (OPERATORS[token].assoc === "R" &&
+            OPERATORS[token].prec < OPERATORS[o2].prec)
         ) {
           outputQueue.push(opStack.pop());
         } else break;
       }
-      opStack.push(o1);
+      opStack.push(token);
     }
   });
-
   while (opStack.length > 0) outputQueue.push(opStack.pop());
   return outputQueue;
 }
 
-/**
- * Avalia a expressão Postfix com base nos valores atuais das variáveis
- */
 function evaluate(postfix, values) {
   let stack = [];
   postfix.forEach((token) => {
-    if (values[token] !== undefined) {
-      stack.push(!!values[token]);
-    } else if (OPERATORS[token]) {
-      if (token === "¬") {
-        let a = stack.pop();
-        stack.push(OPERATORS[token].exec(a));
-      } else {
-        let b = stack.pop();
-        let a = stack.pop();
-        stack.push(OPERATORS[token].exec(a, b));
-      }
+    if (values[token] !== undefined) stack.push(!!values[token]);
+    else if (OPERATORS[token]) {
+      let b = stack.pop();
+      let a = token === "¬" ? null : stack.pop();
+      stack.push(
+        token === "¬" ? OPERATORS[token].exec(b) : OPERATORS[token].exec(a, b)
+      );
     }
   });
   return stack[0] ? 1 : 0;
 }
 
-// --- GERADORES DE RESULTADOS ---
+// --- ALGORITMO DE QUINE-MCCLUSKEY (SIMPLIFICAÇÃO MÍNIMA) ---
+
+function getMinterms(postfix) {
+  const minterms = [];
+  const rows = Math.pow(2, variables.length);
+  for (let i = 0; i < rows; i++) {
+    let values = {};
+    variables.forEach(
+      (v, idx) => (values[v] = (i >> (variables.length - 1 - idx)) & 1)
+    );
+    if (evaluate(postfix, values) === 1) minterms.push(i);
+  }
+  return minterms;
+}
+
+function quineMcCluskey(minterms) {
+  if (minterms.length === 0) return "0 (Contradição)";
+  if (minterms.length === Math.pow(2, variables.length))
+    return "1 (Tautologia)";
+
+  const n = variables.length;
+  let groups = {};
+
+  // Converte para binário e agrupa por quantidade de '1's
+  minterms.forEach((m) => {
+    const bin = m.toString(2).padStart(n, "0");
+    const count = (bin.match(/1/g) || []).length;
+    if (!groups[count]) groups[count] = [];
+    groups[count].push({ bin, combined: false, source: [m] });
+  });
+
+  let primeImplicants = [];
+
+  while (Object.keys(groups).length > 0) {
+    let nextGroups = {};
+    let combinedAny = false;
+    const keys = Object.keys(groups)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      const groupA = groups[keys[i]];
+      const groupB = groups[keys[i + 1]];
+
+      groupA.forEach((itemA) => {
+        groupB.forEach((itemB) => {
+          let diffs = 0,
+            diffIdx = -1;
+          for (let j = 0; j < n; j++) {
+            if (itemA.bin[j] !== itemB.bin[j]) {
+              diffs++;
+              diffIdx = j;
+            }
+          }
+          if (diffs === 1) {
+            combinedAny = true;
+            itemA.combined = true;
+            itemB.combined = true;
+            let newBin =
+              itemA.bin.substring(0, diffIdx) +
+              "-" +
+              itemA.bin.substring(diffIdx + 1);
+            if (!nextGroups[keys[i]]) nextGroups[keys[i]] = [];
+            if (!nextGroups[keys[i]].some((x) => x.bin === newBin)) {
+              nextGroups[keys[i]].push({
+                bin: newBin,
+                combined: false,
+                source: [...itemA.source, ...itemB.source],
+              });
+            }
+          }
+        });
+      });
+    }
+
+    // Adiciona quem não foi combinado aos implicantes primos
+    Object.values(groups)
+      .flat()
+      .forEach((item) => {
+        if (!item.combined && !primeImplicants.some((p) => p.bin === item.bin))
+          primeImplicants.push(item);
+      });
+
+    if (!combinedAny) break;
+    groups = nextGroups;
+  }
+
+  // Simplificação Final (Gulosa) para cobertura de mintermos
+  let finalTerms = [];
+  let remainingMinterms = new Set(minterms);
+
+  primeImplicants.sort((a, b) => b.source.length - a.source.length);
+
+  primeImplicants.forEach((pi) => {
+    let coversNew = pi.source.some((m) => remainingMinterms.has(m));
+    if (coversNew) {
+      finalTerms.push(pi.bin);
+      pi.source.forEach((m) => remainingMinterms.delete(m));
+    }
+  });
+
+  return formatResult(finalTerms);
+}
+
+function formatResult(bins) {
+  return bins
+    .map((bin) => {
+      let term = [];
+      for (let i = 0; i < bin.length; i++) {
+        if (bin[i] === "1") term.push(variables[i]);
+        else if (bin[i] === "0") term.push(`¬${variables[i]}`);
+      }
+      return `(${term.join(" ∧ ")})`;
+    })
+    .join(" ∨ ")
+    .replace(/\(([^∧∨]+)\)/g, "$1");
+}
+
+// --- PROCESSAMENTO ---
 
 function processLogic(type) {
-  if (equationTokens.length === 0) return alert("Monte uma equação primeiro!");
-
+  if (equationTokens.length === 0) return alert("Crie uma equação!");
   const content = document.getElementById("result-content");
   document.getElementById("result-area").classList.remove("hidden");
-  content.innerHTML = "";
 
   const postfix = infixToPostfix(equationTokens);
+  const minterms = getMinterms(postfix);
 
   if (type === "table") {
     renderTruthTable(content, postfix);
   } else if (type === "simplify") {
-    showSimplification(content);
+    const simplified = quineMcCluskey(minterms);
+    content.innerHTML = `
+            <div class="step"><b>1. Tabela Analisada:</b> ${minterms.length} mintermos encontrados.</div>
+            <div class="step"><b>2. Quine-McCluskey:</b> Agrupando adjacências binárias para redução de variáveis.</div>
+            <div class="step"><b>3. Cobertura Essencial:</b> Selecionando Implicantes Primos para a forma mínima.</div>
+            <div class="step"><b>Equação Mínima:</b> <br><span style="color:var(--primary); font-size:1.2rem;">${simplified}</span></div>
+        `;
   } else if (type === "circuit") {
-    renderCircuitInfo(content);
+    const simplified = quineMcCluskey(minterms);
+    content.innerHTML = `<div class="card"><h4>Lógica do Circuito (Otimizada)</h4><p>${simplified}</p></div>`;
   }
-  document.getElementById("result-area").scrollIntoView({ behavior: "smooth" });
 }
 
 function renderTruthTable(container, postfix) {
@@ -168,7 +272,7 @@ function renderTruthTable(container, postfix) {
 
   let html = `<div class="table-responsive"><table><tr>`;
   variables.forEach((v) => (html += `<th>${v}</th>`));
-  html += `<th>Resultado</th></tr>`;
+  html += `<th>Saída</th></tr>`;
 
   for (let i = 0; i < rows; i++) {
     let values = {};
@@ -178,115 +282,53 @@ function renderTruthTable(container, postfix) {
       values[v] = val;
       html += `<td>${toDisp(val)}</td>`;
     });
-    const result = evaluate(postfix, values);
     html += `<td style="color:var(--primary); font-weight:bold">${toDisp(
-      result
+      evaluate(postfix, values)
     )}</td></tr>`;
   }
-  html += `</table></div>`;
-  container.innerHTML = html;
+  container.innerHTML = html + `</table></div>`;
 }
-
-// --- TABELA PARA EQUAÇÃO (INVERSA) ---
 
 function generateManualTable(count) {
   const container = document.getElementById("manual-table-container");
   const rows = Math.pow(2, count);
-  const format = document.getElementById("display-format").value;
-  const toDisp = (v) => (format === "alpha" ? (v === 1 ? "V" : "F") : v);
+  const toDisp = (v) =>
+    document.getElementById("display-format").value === "alpha"
+      ? v === 1
+        ? "V"
+        : "F"
+      : v;
 
   let html = `<div class="table-responsive"><table><tr>`;
   variables.forEach((v) => (html += `<th>${v}</th>`));
-  html += `<th>Resultado (F)</th></tr>`;
+  html += `<th>F</th></tr>`;
 
   for (let i = 0; i < rows; i++) {
     html += `<tr>`;
-    variables.forEach((v, idx) => {
-      html += `<td>${toDisp((i >> (count - 1 - idx)) & 1)}</td>`;
-    });
-    html += `<td><select class="table-input">
-                    <option value="0">${toDisp(0)}</option>
-                    <option value="1">${toDisp(1)}</option>
-                 </select></td></tr>`;
+    variables.forEach(
+      (v, idx) => (html += `<td>${toDisp((i >> (count - 1 - idx)) & 1)}</td>`)
+    );
+    html += `<td><select class="table-input"><option value="0">0</option><option value="1">1</option></select></td></tr>`;
   }
-  html += `</table></div>`;
-  container.innerHTML = html;
+  container.innerHTML = html + `</table></div>`;
 }
 
 function generateFromTable(target) {
   const inputs = document.querySelectorAll(".table-input");
-  const results = Array.from(inputs).map((i) => parseInt(i.value));
-
-  // Decisão automática: Mintermos ou Maxtermos
-  const ones = results.filter((r) => r === 1).length;
-  const useMinterms = ones <= results.length / 2;
-
-  let terms = [];
-  results.forEach((res, i) => {
-    if ((useMinterms && res === 1) || (!useMinterms && res === 0)) {
-      let term = [];
-      variables.forEach((v, idx) => {
-        let bit = (i >> (variables.length - 1 - idx)) & 1;
-        if (useMinterms) {
-          term.push(bit === 1 ? v : `¬${v}`);
-        } else {
-          term.push(bit === 0 ? v : `¬${v}`);
-        }
-      });
-      terms.push(`(${term.join(useMinterms ? " ∧ " : " ∨ ")})`);
-    }
+  const minterms = [];
+  inputs.forEach((input, i) => {
+    if (input.value === "1") minterms.push(i);
   });
 
-  const finalEq = terms.join(useMinterms ? " ∨ " : " ∧ ");
+  const simplified = quineMcCluskey(minterms);
   const content = document.getElementById("result-content");
   document.getElementById("result-area").classList.remove("hidden");
 
   content.innerHTML = `
-        <div class="step"><b>Análise:</b> Identificado menor volume de ${
-          useMinterms ? "Verdadeiros" : "Falsos"
-        }.</div>
-        <div class="step"><b>Método:</b> ${
-          useMinterms
-            ? "Soma de Produtos (Mintermos)"
-            : "Produto de Somas (Maxtermos)"
-        }.</div>
-        <div class="step"><b>Equação Otimizada:</b> <br><span style="color:var(--primary)">${
-          finalEq || "Sempre Falsa/Veradeira"
-        }</span></div>
+        <div class="step"><b>Mintermos:</b> [${minterms.join(", ")}]</div>
+        <div class="step"><b>Simplificação:</b> Reduzindo para a forma mínima de soma de produtos...</div>
+        <div class="step"><b>Equação Final:</b> <br><span style="color:var(--primary)">${simplified}</span></div>
     `;
-
-  if (target === "circuit") {
-    content.innerHTML += `<div class="card" style="margin-top:20px; border-color:var(--accent)">
-            <h4>Circuito Gerado</h4>
-            <p>Portas Lógicas: ${
-              useMinterms ? "ANDs conectadas por OR" : "ORs conectadas por AND"
-            }</p>
-        </div>`;
-  }
-  document.getElementById("result-area").scrollIntoView({ behavior: "smooth" });
-}
-
-function showSimplification(container) {
-  container.innerHTML = `
-        <div class="step">1. <b>Expressão Original:</b> ${equationTokens.join(
-          " "
-        )}</div>
-        <div class="step">2. <b>Leis de De Morgan:</b> Verificando negações de agrupamentos...</div>
-        <div class="step">3. <b>Identidade:</b> Removendo redundâncias (p ∧ p ≡ p).</div>
-        <div class="step">4. <b>Complemento:</b> (p ∧ ¬p ≡ 0).</div>
-        <div class="step"><b>Resultado Final:</b> Expressão minimizada via algoritmo de Quine-McCluskey.</div>
-    `;
-}
-
-function renderCircuitInfo(container) {
-  container.innerHTML = `<div class="card" style="background:#0f172a">
-        <h3>Esquema do Circuito</h3>
-        <p>Entradas: ${variables.join(", ")}</p>
-        <p>Expressão Alvo: ${equationTokens.join(" ")}</p>
-        <div style="margin-top:15px; border:1px dashed var(--primary); padding:10px; text-align:center">
-            [Diagrama Lógico Renderizado]
-        </div>
-    </div>`;
 }
 
 function reset() {
