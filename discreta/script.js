@@ -265,6 +265,8 @@ function processLogic(type) {
   }
 }
 
+// --- RENDERIZAÇÃO E TABELAS INVERTIDAS (Começando com Verdadeiros) ---
+
 function renderTruthTable(container, postfix) {
   const rows = Math.pow(2, variables.length);
   const format = document.getElementById("display-format").value;
@@ -274,7 +276,8 @@ function renderTruthTable(container, postfix) {
   variables.forEach((v) => (html += `<th>${v}</th>`));
   html += `<th>Saída</th></tr>`;
 
-  for (let i = 0; i < rows; i++) {
+  // Loop invertido para começar do topo (ex: 11, 10, 01, 00)
+  for (let i = rows - 1; i >= 0; i--) {
     let values = {};
     html += `<tr>`;
     variables.forEach((v, idx) => {
@@ -303,12 +306,14 @@ function generateManualTable(count) {
   variables.forEach((v) => (html += `<th>${v}</th>`));
   html += `<th>F</th></tr>`;
 
-  for (let i = 0; i < rows; i++) {
+  // Loop invertido para começar do topo (ex: 11, 10, 01, 00)
+  for (let i = rows - 1; i >= 0; i--) {
     html += `<tr>`;
     variables.forEach(
       (v, idx) => (html += `<td>${toDisp((i >> (count - 1 - idx)) & 1)}</td>`)
     );
-    html += `<td><select class="table-input"><option value="0">0</option><option value="1">1</option></select></td></tr>`;
+    // Atributo data-minterm é crucial para o JS não confundir as linhas
+    html += `<td><select class="table-input" data-minterm="${i}"><option value="0">0</option><option value="1">1</option></select></td></tr>`;
   }
   container.innerHTML = html + `</table></div>`;
 }
@@ -316,9 +321,16 @@ function generateManualTable(count) {
 function generateFromTable(target) {
   const inputs = document.querySelectorAll(".table-input");
   const minterms = [];
-  inputs.forEach((input, i) => {
-    if (input.value === "1") minterms.push(i);
+
+  // Lê baseado no atributo data-minterm, e não na ordem visual da tabela
+  inputs.forEach((input) => {
+    if (input.value === "1") {
+      minterms.push(parseInt(input.getAttribute("data-minterm")));
+    }
   });
+
+  // Ordena os mintermos do menor para o maior para o Quine-McCluskey processar corretamente
+  minterms.sort((a, b) => a - b);
 
   const simplified = quineMcCluskey(minterms);
   const content = document.getElementById("result-content");
@@ -327,7 +339,7 @@ function generateFromTable(target) {
   content.innerHTML = `
         <div class="step"><b>Mintermos:</b> [${minterms.join(", ")}]</div>
         <div class="step"><b>Simplificação:</b> Reduzindo para a forma mínima de soma de produtos...</div>
-        <div class="step"><b>Equação Final:</b> <br><span style="color:var(--primary)">${simplified}</span></div>
+        <div class="step"><b>Equação Final:</b> <br><span style="color:var(--primary); font-size:1.2rem;">${simplified}</span></div>
     `;
 }
 
