@@ -63,10 +63,10 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
                 btn.textContent = 'Copiado!';
                 btn.classList.add('copied');
                 
-                setTimeout(() => {
+                /*setTimeout(() => {
                     btn.textContent = 'Copiar';
                     btn.classList.remove('copied');
-                }, 2000);
+                }, 2000);*/
             });
         });
 
