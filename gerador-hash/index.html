@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador SHA-256 para Base64</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gerador SHA-256 (Base64)</h1>
+        
+        <div class="config-grid">
+            <!-- Determinar quantidade -->
+            <div class="input-group">
+                <label>Início da Contagem</label>
+                <input type="number" id="startRange" value="1">
+            </div>
+            <div class="input-group">
+                <label>Fim da Contagem</label>
+                <input type="number" id="endRange" value="5">
+            </div>
+            
+            <!-- Composição do que será hasheado -->
+            <div class="input-group">
+                <label>Prefixo da Composição</label>
+                <input type="text" id="prefixComp" placeholder="Ex: chave_">
+            </div>
+            <div class="input-group">
+                <label>Sufixo da Composição</label>
+                <input type="text" id="suffixComp" placeholder="Ex: _2024">
+            </div>
+
+            <!-- Texto antes da saída -->
+            <div class="input-group full-width">
+                <label>Texto a ser inserido ANTES do Hash final</label>
+                <input type="text" id="preResultText" placeholder="Ex: token:">
+            </div>
+        </div>
+
+        <button id="generateBtn">Gerar Hashes</button>
+
+        <div id="results" class="results-container">
+            <!-- Resultados injetados via JS -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
