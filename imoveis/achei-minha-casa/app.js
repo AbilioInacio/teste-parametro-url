@@ -10,7 +10,9 @@ const State = {
   currentView: 'portal-geral',
   activeRealtorFilter: null, // Se visualizar perfil específico de um corretor
   selectedProperty: null, // Para exibir modal de detalhes
-  tempImages: [] // Imagens em buffer durante cadastro de imóveis
+  tempImages: [], // Imagens em buffer durante cadastro de imóveis
+  tempRegAvatar: null,
+  tempRegOffice: null
 };
 
 // --- GERADOR DE IMAGENS SEMENTE (CANVAS VECTOR RENDER) ---
@@ -513,6 +515,9 @@ function switchView(viewId, params = {}) {
     document.getElementById('perfil-corretor-section').classList.add('active');
   } else if (viewId === 'login') {
     document.getElementById('login-section').classList.add('active');
+  } else if (viewId === 'cadastro-usuario') {
+    renderCadastroUsuario();
+    document.getElementById('cadastro-usuario-section').classList.add('active');
   } else if (viewId === 'painel-corretor') {
     if (!State.currentUser) {
       switchView('login');
@@ -526,10 +531,12 @@ function switchView(viewId, params = {}) {
   const sidebar = document.getElementById('app-sidebar');
   const btnPanel = document.getElementById('topbar-btn-panel');
   const btnLogin = document.getElementById('topbar-btn-login');
+  const btnRegister = document.getElementById('topbar-btn-register');
   const btnLogout = document.getElementById('topbar-btn-logout');
 
   if (State.currentUser) {
     if (btnLogin) btnLogin.style.display = 'none';
+    if (btnRegister) btnRegister.style.display = 'none';
     if (viewId === 'painel-corretor') {
       if (sidebar) sidebar.style.display = 'flex';
       if (btnPanel) btnPanel.style.display = 'none';
@@ -549,6 +556,7 @@ function switchView(viewId, params = {}) {
     if (sidebar) sidebar.style.display = 'none';
     if (btnPanel) btnPanel.style.display = 'none';
     if (btnLogin) btnLogin.style.display = 'inline-flex';
+    if (btnRegister) btnRegister.style.display = 'inline-flex';
     if (btnLogout) {
       btnLogout.style.display = 'none';
       btnLogout.classList.remove('logged-in');
@@ -849,10 +857,12 @@ function setupSidebarForUser() {
   const userProfileRow = document.getElementById('sidebar-user-profile');
   const menuContainer = document.getElementById('sidebar-menu-list');
   const topbarLogout = document.getElementById('topbar-btn-logout');
+  const btnRegister = document.getElementById('topbar-btn-register');
 
   if (!State.currentUser) {
     sidebar.style.display = 'none';
     document.getElementById('topbar-btn-login').style.display = 'flex';
+    if (btnRegister) btnRegister.style.display = 'inline-flex';
     document.getElementById('topbar-btn-panel').style.display = 'none';
     if (topbarLogout) topbarLogout.style.display = 'none';
     return;
@@ -861,6 +871,7 @@ function setupSidebarForUser() {
   // Mostrar Sidebar e ocultar botões externos
   sidebar.style.display = 'flex';
   document.getElementById('topbar-btn-login').style.display = 'none';
+  if (btnRegister) btnRegister.style.display = 'none';
   document.getElementById('topbar-btn-panel').style.display = 'flex';
 
   const user = State.currentUser;
@@ -1624,6 +1635,177 @@ function deleteRealtor(realtorId) {
   }
 }
 
+// --- CADASTRO DE NOVOS USUÁRIOS (CORRETOR E CLIENTE) ---
+function renderCadastroUsuario() {
+  const form = document.getElementById('register-form');
+  if (form) form.reset();
+
+  State.tempRegAvatar = null;
+  State.tempRegOffice = null;
+
+  const avatarPreview = document.getElementById('reg-avatar-preview');
+  const officePreview = document.getElementById('reg-office-preview');
+  if (avatarPreview) avatarPreview.style.display = 'none';
+  if (officePreview) officePreview.style.display = 'none';
+
+  const avatarImg = document.getElementById('img-reg-avatar-preview');
+  const officeImg = document.getElementById('img-reg-office-preview');
+  if (avatarImg) avatarImg.src = '';
+  if (officeImg) officeImg.src = '';
+
+  const avatarStatus = document.getElementById('reg-avatar-status');
+  const officeStatus = document.getElementById('reg-office-status');
+  if (avatarStatus) avatarStatus.innerText = 'Selecione foto...';
+  if (officeStatus) officeStatus.innerText = 'Selecione foto...';
+
+  setRegisterUserType('realtor');
+}
+
+function setRegisterUserType(type) {
+  const toggleRealtor = document.getElementById('reg-toggle-realtor');
+  const toggleClient = document.getElementById('reg-toggle-client');
+  const regType = document.getElementById('reg-type');
+  const officeAddress = document.getElementById('reg-office-address');
+
+  if (type === 'realtor') {
+    if (toggleRealtor) {
+      toggleRealtor.classList.remove('btn-outline');
+      toggleRealtor.classList.add('btn-primary');
+    }
+    if (toggleClient) {
+      toggleClient.classList.remove('btn-primary');
+      toggleClient.classList.add('btn-outline');
+    }
+    if (regType) regType.value = 'realtor';
+
+    document.querySelectorAll('.class-realtor-fields').forEach(el => el.style.display = '');
+    document.querySelectorAll('.class-client-fields').forEach(el => el.style.display = 'none');
+    if (officeAddress) officeAddress.required = true;
+  } else {
+    if (toggleRealtor) {
+      toggleRealtor.classList.remove('btn-primary');
+      toggleRealtor.classList.add('btn-outline');
+    }
+    if (toggleClient) {
+      toggleClient.classList.remove('btn-outline');
+      toggleClient.classList.add('btn-primary');
+    }
+    if (regType) regType.value = 'client';
+
+    document.querySelectorAll('.class-realtor-fields').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.class-client-fields').forEach(el => el.style.display = '');
+    if (officeAddress) officeAddress.required = false;
+  }
+}
+
+function handleRegAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('reg-avatar-status');
+  if (statusEl) statusEl.innerText = 'Processando...';
+
+  compressUploadedImage(file, function(compressedBase64) {
+    State.tempRegAvatar = compressedBase64;
+    
+    const previewDiv = document.getElementById('reg-avatar-preview');
+    const previewImg = document.getElementById('img-reg-avatar-preview');
+    if (previewDiv && previewImg) {
+      previewImg.src = compressedBase64;
+      previewDiv.style.display = 'block';
+    }
+    if (statusEl) statusEl.innerText = 'Foto carregada!';
+  });
+}
+
+function handleRegOfficeUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('reg-office-status');
+  if (statusEl) statusEl.innerText = 'Processando...';
+
+  compressUploadedImage(file, function(compressedBase64) {
+    State.tempRegOffice = compressedBase64;
+    
+    const previewDiv = document.getElementById('reg-office-preview');
+    const previewImg = document.getElementById('img-reg-office-preview');
+    if (previewDiv && previewImg) {
+      previewImg.src = compressedBase64;
+      previewDiv.style.display = 'block';
+    }
+    if (statusEl) statusEl.innerText = 'Foto carregada!';
+  });
+}
+
+function handleRegisterSubmit(e) {
+  e.preventDefault();
+  const type = document.getElementById('reg-type').value;
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.replace(/\D/g, '');
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const password = document.getElementById('reg-password').value;
+
+  // Verificar se o e-mail já existe
+  const emailExistsInRealtors = State.realtors.some(r => r.email.toLowerCase() === email);
+  const emailExistsInClients = State.clients.some(c => c.email.toLowerCase() === email);
+
+  if (emailExistsInRealtors || emailExistsInClients) {
+    alert('Este e-mail já está cadastrado no sistema! Por favor, utilize outro.');
+    return;
+  }
+
+  if (type === 'realtor') {
+    const realtorId = 'corretor-' + Date.now();
+    const officeAddressVal = document.getElementById('reg-office-address').value.trim();
+    
+    const newRealtor = {
+      id: realtorId,
+      name: name,
+      phone: phone,
+      email: email,
+      officeAddress: officeAddressVal,
+      avatar: State.tempRegAvatar || generateSeedImage('realtor', 180, 180, name.split(' ').map(n => n[0]).join('').substring(0, 2), Math.floor(Math.random() * 3) + 1),
+      officePhoto: State.tempRegOffice || null,
+      password: password
+    };
+
+    State.realtors.push(newRealtor);
+    State.currentUser = { type: 'realtor', data: newRealtor };
+    
+    saveStateToLocalStorage();
+    populateRealtorFilterOptions();
+    setupSidebarForUser();
+    
+    alert('Cadastro de Corretor realizado com sucesso! Bem-vindo(a) ao Achei minha Casa.');
+    switchView('painel-corretor', { subView: 'dashboard-home' });
+    
+  } else {
+    const clientId = 'cliente-' + Date.now();
+    const defaultRealtorId = State.realtors[0] ? State.realtors[0].id : 'corretor-1';
+    const clientNotesVal = document.getElementById('reg-client-notes').value.trim();
+
+    const newClient = {
+      id: clientId,
+      realtorId: defaultRealtorId,
+      name: name,
+      phone: phone,
+      email: email,
+      notes: clientNotesVal,
+      password: password
+    };
+
+    State.clients.push(newClient);
+    State.currentUser = { type: 'client', data: newClient };
+
+    saveStateToLocalStorage();
+    setupSidebarForUser();
+
+    alert('Cadastro de Cliente realizado com sucesso! Bem-vindo(a) ao Achei minha Casa.');
+    switchView('painel-corretor', { subView: 'cliente-home' });
+  }
+}
+
 // --- MÁSCARAS E FORMATAÇÕES AUXILIARES ---
 function formatPhoneNumber(numStr) {
   const num = numStr.replace(/\D/g, '');
@@ -1678,6 +1860,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('visit-form').addEventListener('submit', handleVisitSubmit);
   document.getElementById('modal-visit-form').addEventListener('submit', handlePublicScheduleSubmit);
   document.getElementById('team-form').addEventListener('submit', handleTeamSubmit);
+  
+  // Registrar escutadores de cadastro de usuários
+  document.getElementById('register-form').addEventListener('submit', handleRegisterSubmit);
+  document.getElementById('reg-avatar-upload').addEventListener('change', handleRegAvatarUpload);
+  document.getElementById('reg-office-upload').addEventListener('change', handleRegOfficeUpload);
 
   // Iniciar na vitrine do Portal Geral
   switchView('portal-geral');
