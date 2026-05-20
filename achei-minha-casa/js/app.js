@@ -1,7 +1,7 @@
 // --- MÓDULO DE AUTENTICAÇÃO ---
 const AuthModule = {
-    renderLogin() {
-        document.getElementById('app-container').innerHTML = `
+  renderLogin() {
+    document.getElementById("app-container").innerHTML = `
             <form onsubmit="AuthModule.login(event)">
                 <h2>Acesso ao Sistema</h2>
                 <p>Use qualquer dado para simular o acesso como corretor.</p>
@@ -10,23 +10,23 @@ const AuthModule = {
                 <button type="submit" class="btn btn-primary">Entrar no Painel</button>
             </form>
         `;
-    },
-    login(e) {
-        e.preventDefault();
-        const user = Storage.getData().usuarios[0];
-        Storage.setCurrentUser(user);
-        window.location.hash = '#/dashboard';
-    },
-    logout() {
-        Storage.setCurrentUser(null);
-        window.location.hash = '#/home';
-    }
+  },
+  login(e) {
+    e.preventDefault();
+    const user = Storage.getData().usuarios[0];
+    Storage.setCurrentUser(user);
+    window.location.hash = "#/dashboard";
+  },
+  logout() {
+    Storage.setCurrentUser(null);
+    window.location.hash = "#/home";
+  },
 };
 
 // --- MÓDULO DO SITE PÚBLICO ---
 const SiteModule = {
-    renderVitrine() {
-        document.getElementById('app-container').innerHTML = `
+  renderVitrine() {
+    document.getElementById("app-container").innerHTML = `
             <div class="vitrine-layout">
                 <aside class="filters">
                     <h4>Filtrar Busca</h4>
@@ -50,45 +50,55 @@ const SiteModule = {
                 <div id="imoveis-list" class="card-grid"></div>
             </div>
         `;
-        this.filtrar();
-    },
+    this.filtrar();
+  },
 
-    filtrar() {
-        const db = Storage.getData();
-        const fFin = document.getElementById('f-finalidade').value;
-        const fBairro = document.getElementById('f-bairro').value.toLowerCase();
-        const fMin = parseFloat(document.getElementById('f-min').value) || 0;
-        const fMax = parseFloat(document.getElementById('f-max').value) || Infinity;
-        const fQtd = parseInt(document.getElementById('f-quartos').value) || 0;
+  filtrar() {
+    const db = Storage.getData();
+    const fFin = document.getElementById("f-finalidade").value;
+    const fBairro = document.getElementById("f-bairro").value.toLowerCase();
+    const fMin = parseFloat(document.getElementById("f-min").value) || 0;
+    const fMax = parseFloat(document.getElementById("f-max").value) || Infinity;
+    const fQtd = parseInt(document.getElementById("f-quartos").value) || 0;
 
-        const filtrados = db.imoveis.filter(i => 
-            (!fFin || i.finalidade === fFin) &&
-            (!fBairro || i.bairro.toLowerCase().includes(fBairro)) &&
-            (i.preco >= fMin && i.preco <= fMax) &&
-            (i.quartos >= fQtd)
-        );
+    const filtrados = db.imoveis.filter(
+      (i) =>
+        (!fFin || i.finalidade === fFin) &&
+        (!fBairro || i.bairro.toLowerCase().includes(fBairro)) &&
+        i.preco >= fMin &&
+        i.preco <= fMax &&
+        i.quartos >= fQtd,
+    );
 
-        document.getElementById('imoveis-list').innerHTML = filtrados.map(i => `
+    document.getElementById("imoveis-list").innerHTML =
+      filtrados
+        .map(
+          (i) => `
             <div class="card" onclick="location.hash='#/detalhes?id=${i.id}'" style="cursor:pointer">
                 <div class="badge">${i.finalidade.toUpperCase()}</div>
-                <img src="${i.imagem || 'https://via.placeholder.com/400x300'}">
+                <img src="${i.imagem || "https://via.placeholder.com/400x300"}">
                 <div class="card-body">
                     <h3>${i.titulo}</h3>
                     <p class="price">R$ ${i.preco.toLocaleString()}</p>
                     <p>${i.bairro} • ${i.quartos} qtos</p>
                 </div>
             </div>
-        `).join('') || '<p>Nenhum imóvel encontrado.</p>';
-    },
+        `,
+        )
+        .join("") || "<p>Nenhum imóvel encontrado.</p>";
+  },
 
-    renderDetalhes() {
-        const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
-        const id = parseInt(urlParams.get('id'));
-        const imovel = Storage.getData().imoveis.find(i => i.id === id);
+  renderDetalhes() {
+    const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
+    const id = parseInt(urlParams.get("id"));
+    const imovel = Storage.getData().imoveis.find((i) => i.id === id);
 
-        if(!imovel) { location.hash = '#/home'; return; }
+    if (!imovel) {
+      location.hash = "#/home";
+      return;
+    }
 
-        document.getElementById('app-container').innerHTML = `
+    document.getElementById("app-container").innerHTML = `
             <div class="detalhes-container">
                 <div class="detalhes-grid">
                     <div>
@@ -114,34 +124,41 @@ const SiteModule = {
                 </div>
             </div>
         `;
-    },
+  },
 
-    salvarLead(e, imovelId) {
-        e.preventDefault();
-        const lead = {
-            nome: document.getElementById('l-nome').value,
-            telefone: document.getElementById('l-tel').value
-        };
-        Storage.save('clientes', lead);
-        Storage.save('visitas', { ...lead, imovelId, data: document.getElementById('l-data').value, status: 'pendente' });
-        alert("Agendamento solicitado!");
-        location.hash = '#/home';
-    },
+  salvarLead(e, imovelId) {
+    e.preventDefault();
+    const lead = {
+      nome: document.getElementById("l-nome").value,
+      telefone: document.getElementById("l-tel").value,
+    };
+    Storage.save("clientes", lead);
+    Storage.save("visitas", {
+      ...lead,
+      imovelId,
+      data: document.getElementById("l-data").value,
+      status: "pendente",
+    });
+    alert("Agendamento solicitado!");
+    location.hash = "#/home";
+  },
 
-    zap(id) {
-        const i = Storage.getData().imoveis.find(x => x.id === id);
-        const msg = encodeURIComponent(`Olá, tenho interesse no imóvel: ${i.titulo} (Cod: ${i.id})`);
-        window.open(`https://wa.me/5511999999999?text=${msg}`);
-    }
+  zap(id) {
+    const i = Storage.getData().imoveis.find((x) => x.id === id);
+    const msg = encodeURIComponent(
+      `Olá, tenho interesse no imóvel: ${i.titulo} (Cod: ${i.id})`,
+    );
+    window.open(`https://wa.me/5564992426607?text=${msg}`);
+  },
 };
 
 // --- MÓDULO DASHBOARD ---
 const DashboardModule = {
-    render() {
-        const db = Storage.getData();
-        const pendentes = db.visitas.filter(v => v.status === 'pendente').length;
+  render() {
+    const db = Storage.getData();
+    const pendentes = db.visitas.filter((v) => v.status === "pendente").length;
 
-        document.getElementById('app-container').innerHTML = `
+    document.getElementById("app-container").innerHTML = `
             <div style="padding: 2rem 5%">
                 <h1>Bem-vindo, Corretor</h1>
                 <div class="kpi-grid">
@@ -162,14 +179,14 @@ const DashboardModule = {
                 <button class="btn btn-primary" onclick="location.hash='#/imoveis/novo'">+ Cadastrar Novo Imóvel</button>
             </div>
         `;
-    }
+  },
 };
 
 // --- MÓDULO GESTÃO DE IMÓVEIS ---
 const ImoveisModule = {
-    renderList() {
-        const imoveis = Storage.getData().imoveis;
-        document.getElementById('app-container').innerHTML = `
+  renderList() {
+    const imoveis = Storage.getData().imoveis;
+    document.getElementById("app-container").innerHTML = `
             <div style="padding: 2rem 5%">
                 <div style="display:flex; justify-content:space-between">
                     <h1>Meus Imóveis</h1>
@@ -178,22 +195,26 @@ const ImoveisModule = {
                 <table class="data-table">
                     <thead><tr><th>Título</th><th>Preço</th><th>Bairro</th><th>Ações</th></tr></thead>
                     <tbody>
-                        ${imoveis.map(i => `
+                        ${imoveis
+                          .map(
+                            (i) => `
                             <tr>
                                 <td>${i.titulo}</td>
                                 <td>R$ ${i.preco.toLocaleString()}</td>
                                 <td>${i.bairro}</td>
                                 <td><button onclick="ImoveisModule.excluir(${i.id})" style="color:red; border:none; background:none; cursor:pointer">Excluir</button></td>
                             </tr>
-                        `).join('')}
+                        `,
+                          )
+                          .join("")}
                     </tbody>
                 </table>
             </div>
         `;
-    },
+  },
 
-    renderForm() {
-        document.getElementById('app-container').innerHTML = `
+  renderForm() {
+    document.getElementById("app-container").innerHTML = `
             <form onsubmit="ImoveisModule.salvar(event)">
                 <h2>Novo Imóvel</h2>
                 <input type="text" id="titulo" placeholder="Título do Imóvel" required>
@@ -214,64 +235,67 @@ const ImoveisModule = {
                 </div>
             </form>
         `;
-    },
+  },
 
-    async salvar(e) {
-        e.preventDefault();
-        const file = document.getElementById('foto').files[0];
-        const imagem = await this.compress(file);
+  async salvar(e) {
+    e.preventDefault();
+    const file = document.getElementById("foto").files[0];
+    const imagem = await this.compress(file);
 
-        const novo = {
-            titulo: document.getElementById('titulo').value,
-            finalidade: document.getElementById('finalidade').value,
-            tipo: document.getElementById('tipo').value,
-            preco: parseFloat(document.getElementById('preco').value),
-            quartos: parseInt(document.getElementById('quartos').value),
-            bairro: document.getElementById('bairro').value,
-            imagem
+    const novo = {
+      titulo: document.getElementById("titulo").value,
+      finalidade: document.getElementById("finalidade").value,
+      tipo: document.getElementById("tipo").value,
+      preco: parseFloat(document.getElementById("preco").value),
+      quartos: parseInt(document.getElementById("quartos").value),
+      bairro: document.getElementById("bairro").value,
+      imagem,
+    };
+
+    Storage.save("imoveis", novo);
+    location.hash = "#/imoveis";
+  },
+
+  compress(file) {
+    return new Promise((res) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = 600;
+          canvas.height = 400;
+          ctx.drawImage(img, 0, 0, 600, 400);
+          res(canvas.toDataURL("image/jpeg", 0.7));
         };
+      };
+    });
+  },
 
-        Storage.save('imoveis', novo);
-        location.hash = '#/imoveis';
-    },
-
-    compress(file) {
-        return new Promise(res => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 600; canvas.height = 400;
-                    ctx.drawImage(img, 0, 0, 600, 400);
-                    res(canvas.toDataURL('image/jpeg', 0.7));
-                }
-            }
-        });
-    },
-
-    excluir(id) {
-        if(confirm("Excluir imóvel?")) {
-            Storage.delete('imoveis', id);
-            this.renderList();
-        }
+  excluir(id) {
+    if (confirm("Excluir imóvel?")) {
+      Storage.delete("imoveis", id);
+      this.renderList();
     }
+  },
 };
 
 // --- MÓDULO AGENDA ---
 const AgendaModule = {
-    render() {
-        const visitas = Storage.getData().visitas;
-        document.getElementById('app-container').innerHTML = `
+  render() {
+    const visitas = Storage.getData().visitas;
+    document.getElementById("app-container").innerHTML = `
             <div style="padding: 2rem 5%">
                 <h1>Agenda de Visitas</h1>
                 <table class="data-table">
                     <thead><tr><th>Data</th><th>Cliente</th><th>Status</th><th>Ações</th></tr></thead>
                     <tbody>
-                        ${visitas.map(v => `
+                        ${visitas
+                          .map(
+                            (v) => `
                             <tr>
                                 <td>${v.data}</td>
                                 <td>${v.nome}<br><small>${v.telefone}</small></td>
@@ -281,14 +305,16 @@ const AgendaModule = {
                                     <button onclick="AgendaModule.status(${v.id}, 'cancelada')">❌</button>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `,
+                          )
+                          .join("")}
                     </tbody>
                 </table>
             </div>
         `;
-    },
-    status(id, s) {
-        Storage.update('visitas', id, { status: s });
-        this.render();
-    }
+  },
+  status(id, s) {
+    Storage.update("visitas", id, { status: s });
+    this.render();
+  },
 };
