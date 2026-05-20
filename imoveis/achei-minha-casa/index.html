@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achei minha Casa - Encontre o imóvel dos seus sonhos</title>
+  <meta name="description" content="Sistema exclusivo para corretores independentes e pequenas imobiliárias. Encontre seu lar ideal ou gerencie sua carteira de imóveis de forma premium.">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+  <!-- Topbar Pública Fixo (Sempre Visível) -->
+  <header class="topbar">
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="switchView('portal-geral')">
+      <div class="sidebar-logo">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span>Achei minha Casa</span>
+      </div>
+    </div>
+
+    <nav class="topbar-nav">
+      <button class="btn btn-outline" onclick="switchView('portal-geral')"><span class="btn-text">Vitrine</span></button>
+      <button id="topbar-btn-login" class="btn btn-primary" onclick="switchView('login')">
+        <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
+        </svg>
+        <span class="btn-text">Acessar</span>
+      </button>
+      <button id="topbar-btn-panel" class="btn btn-secondary" style="display: none;" onclick="switchView('painel-corretor', { subView: 'dashboard-home' })">
+        <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+        </svg>
+        <span class="btn-text">Painel</span>
+      </button>
+      <button id="topbar-btn-logout" class="btn btn-outline" style="display: none; border-color: var(--danger); color: var(--danger);" onclick="handleLogout()">
+        <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
+        </svg>
+        <span class="btn-text">Sair</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Container Geral da SPA -->
+  <main id="app-container">
+
+    <!-- Sidebar do Painel de Gestão (Visível apenas após Login) -->
+    <aside id="app-sidebar" class="sidebar" style="display: none;">
+      <!-- Perfil do Usuário Logado -->
+      <div id="sidebar-user-profile" class="sidebar-profile">
+        <!-- Injetado via JS (Avatar e Nome) -->
+      </div>
+
+      <!-- Links de Navegação Interna -->
+      <nav id="sidebar-menu-list" class="sidebar-menu">
+        <!-- Injetado dinamicamente dependendo se é corretor ou cliente -->
+      </nav>
+
+      <!-- Botão de Sair do Painel -->
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="handleLogout()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Sair do Sistema
+        </button>
+      </div>
+    </aside>
+
+    <!-- Área Principal de Visualização de Telas -->
+    <section class="main-content">
+
+      <!-- ============================================== -->
+      <!-- TELA 1: PORTAL GERAL (VITRINE PÚBLICA)         -->
+      <!-- ============================================== -->
+      <article id="portal-geral-section" class="app-section">
+        <div class="portal-hero">
+          <h1>Encontre a sua Nova Casa com Facilidade</h1>
+          <p>Explore os melhores imóveis cadastrados pelos corretores mais qualificados e agende uma visita diretamente pelo WhatsApp!</p>
+          
+          <!-- Filtro Premium -->
+          <div class="filter-box">
+            <div class="filter-group">
+              <label for="search-property-general">Buscar Imóvel</label>
+              <input id="search-property-general" class="filter-input" type="text" placeholder="Código, rua ou bairro...">
+            </div>
+            
+            <div class="filter-group">
+              <label for="filter-type-general">Tipo</label>
+              <select id="filter-type-general" class="filter-input">
+                <option value="">Todos</option>
+                <option value="sale">Venda</option>
+                <option value="rent">Aluguel</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-realtor-general">Corretor</label>
+              <select id="filter-realtor-general" class="filter-input">
+                <!-- Injetado dinamicamente via JS -->
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-price-general">Preço Máximo</label>
+              <select id="filter-price-general" class="filter-input">
+                <option value="">Qualquer Preço</option>
+                <option value="5000">R$ 5.000 / mês</option>
+                <option value="10000">R$ 10.000 / mês</option>
+                <option value="500000">R$ 500.000</option>
+                <option value="1000000">R$ 1.000.000</option>
+                <option value="3000000">R$ 3.000.000</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" onclick="renderPortalGeral()">Filtrar</button>
+          </div>
+        </div>
+
+        <!-- Grade de Imóveis -->
+        <h2 style="font-size: 22px; font-weight: 700; margin-top: 40px; margin-bottom: 8px;">Vitrine de Destaques</h2>
+        <div id="portal-properties-grid" class="properties-grid">
+          <!-- Injetado via JS -->
+        </div>
+      </article>
+
+      <!-- ============================================== -->
+      <!-- TELA 2: PERFIL PÚBLICO DO CORRETOR             -->
+      <!-- ============================================== -->
+      <article id="perfil-corretor-section" class="app-section" style="padding: 0;">
+        <!-- Hero Profile do Corretor -->
+        <div class="realtor-hero">
+          <div class="realtor-hero-container">
+            <img id="realtor-profile-avatar" class="realtor-hero-avatar" src="" alt="Avatar">
+            <div class="realtor-hero-info">
+              <span style="font-size: 12px; color: var(--secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Corretor Associado</span>
+              <h1 id="realtor-profile-name">Nome do Corretor</h1>
+              
+              <div class="realtor-hero-meta">
+                <div class="realtor-hero-meta-item">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  <span id="realtor-profile-phone">Telefone</span>
+                </div>
+                <div class="realtor-hero-meta-item">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <span id="realtor-profile-email">Email</span>
+                </div>
+                <div class="realtor-hero-meta-item">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  <span id="realtor-profile-address">Escritório</span>
+                </div>
+              </div>
+              
+              <div style="margin-top: 20px;">
+                <a id="btn-realtor-profile-wp" target="_blank" class="btn btn-success">
+                  <svg style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 2c-5.51 0-9.99 4.479-9.99 9.986 0 1.762.459 3.418 1.261 4.867L2 22l5.314-1.395c1.401.764 2.992 1.203 4.717 1.203 5.51 0 9.99-4.479 9.99-9.986 0-5.507-4.48-9.986-9.99-9.986zm6.39 13.961c-.26.732-1.503 1.341-2.073 1.402-.569.061-1.127.305-3.627-.723-3.187-1.31-5.234-4.544-5.394-4.757-.16-.213-1.282-1.704-1.282-3.251 0-1.547.81-2.308 1.099-2.613.29-.305.63-.381.84-.381.21 0 .42.01.6.02.19.01.44-.07.69.52.26.62.88 2.14.96 2.3.08.16.13.35.02.56-.11.21-.25.35-.37.49-.13.14-.26.29-.11.55.15.26.67 1.11 1.44 1.79.99.88 1.83 1.15 2.09 1.28.26.13.41.11.56-.06.15-.17.65-.75.82-.95.17-.2.34-.17.58-.08.24.09 1.54.72 1.8.85.26.13.44.2.5.31.07.11.07.64-.19 1.37z"/></svg>
+                  Iniciar Conversa no WhatsApp
+                </a>
+                <button class="btn btn-outline" style="margin-left:12px;" onclick="switchView('portal-geral')">Voltar ao Portal</button>
+              </div>
+            </div>
+            <!-- Foto Opcional do Escritório -->
+            <div id="realtor-profile-office-container">
+              <!-- Injetado via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Portfólio de Imóveis do Corretor -->
+        <div style="max-width: 1200px; margin: 0 auto; padding: 40px 32px;">
+          <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 24px;">Imóveis sob minha Gestão</h2>
+          <div id="realtor-properties-grid" class="properties-grid">
+            <!-- Injetado via JS -->
+          </div>
+        </div>
+      </article>
+
+      <!-- ============================================== -->
+      <!-- TELA 3: TELA DE LOGIN (CORRETOR E CLIENTE)      -->
+      <!-- ============================================== -->
+      <article id="login-section" class="app-section" style="padding: 0;">
+        <div class="login-container">
+          <div class="login-box">
+            <div class="login-header">
+              <div class="login-logo">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Achei minha Casa</span>
+              </div>
+              <p>Acesse sua área restrita de gestão ou calendário de visitas</p>
+            </div>
+
+            <!-- Ajuda de login semente rápida para fins de demonstração -->
+            <div class="login-demo-helper">
+              <strong>Demonstração Rápida (Use estes dados):</strong><br>
+              • Corretor: <code>carlos@achei.com</code> / Senha: <code>123</code><br>
+              • Cliente: <code>mariana@cliente.com</code> / Senha: <code>123</code>
+            </div>
+
+            <form id="login-form">
+              <div class="form-group">
+                <label class="form-label" for="login-email">E-mail Cadastrado</label>
+                <input id="login-email" class="form-input" type="email" placeholder="digite seu e-mail de acesso" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label" for="login-password">Senha de Segurança</label>
+                <input id="login-password" class="form-input" type="password" placeholder="digite sua senha" required>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%; padding: 12px;" type="submit">Autenticar no Sistema</button>
+            </form>
+          </div>
+        </div>
+      </article>
+
+      <!-- ============================================== -->
+      <!-- TELA 4: PAINEL DE GESTÃO DO CORRETOR (DASHBOARD)-->
+      <!-- ============================================== -->
+      <article id="painel-corretor-section" class="app-section">
+        
+        <!-- SUBVIEW A: DASHBOARD HOME (Métricas, Gráficos, Atalhos) -->
+        <div id="subview-dashboard-home" class="panel-subview">
+          <h2 class="dashboard-section-title">
+            <svg style="width: 24px; height: 24px; stroke: var(--primary-light);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            Visão Geral e Desempenho
+          </h2>
+
+          <!-- Grade de Métricas (Key Cards) -->
+          <div class="dashboard-grid">
+            <div class="glass-card metric-card">
+              <div class="metric-icon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              </div>
+              <div class="metric-info">
+                <h3 id="stat-total-properties">0</h3>
+                <p>Meus Imóveis</p>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card sec">
+              <div class="metric-icon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              </div>
+              <div class="metric-info">
+                <h3 id="stat-total-clients">0</h3>
+                <p>Clientes Cadastrados</p>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card suc">
+              <div class="metric-icon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+              <div class="metric-info">
+                <h3 id="stat-pending-visits">0</h3>
+                <p>Agendamentos Pendentes</p>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card inf">
+              <div class="metric-icon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              </div>
+              <div class="metric-info">
+                <h3 id="stat-team-size">0</h3>
+                <p>Minha Equipe</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalhamento Adicional com Gráficos CSS e Próximas Visitas -->
+          <div class="dashboard-details">
+            <!-- Feed de Visitas -->
+            <div class="glass-card">
+              <h3 class="dashboard-section-title" style="margin-bottom:16px;">
+                <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Visitas Confirmadas & Pendentes
+              </h3>
+              <div id="dashboard-visits-feed" class="appointment-list">
+                <!-- Injetado via JS -->
+              </div>
+            </div>
+
+            <!-- Gráficos e Ações Rápidas -->
+            <div style="display:flex; flex-direction:column; gap:24px;">
+              <div class="glass-card">
+                <h3 class="dashboard-section-title" style="margin-bottom:16px;">Distribuição de Imóveis</h3>
+                <div class="chart-container">
+                  <div class="chart-bar-wrapper">
+                    <div class="chart-bar-label">
+                      <span>Imóveis para Venda</span>
+                      <span id="chart-sale-label-pct">0%</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                      <div id="chart-sale-fill" class="chart-bar-fill sale"></div>
+                    </div>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <div class="chart-bar-label">
+                      <span>Imóveis para Locação</span>
+                      <span id="chart-rent-label-pct">0%</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                      <div id="chart-rent-fill" class="chart-bar-fill rent"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações Rápidas -->
+              <div class="glass-card">
+                <h3 class="dashboard-section-title" style="margin-bottom:16px;">Ações Rápidas</h3>
+                <div class="quick-actions">
+                  <div class="action-btn" onclick="openNewPropertyForm()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    <span>Novo Imóvel</span>
+                  </div>
+                  <div class="action-btn" onclick="openNewClientForm()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                    <span>Novo Cliente</span>
+                  </div>
+                  <div class="action-btn" onclick="openNewVisitForm()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span>Nova Visita</span>
+                  </div>
+                  <div class="action-btn" onclick="openNewTeamForm()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span>Novo Corretor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW B: GESTÃO DE IMÓVEIS (TABELA E CRUDS) -->
+        <div id="subview-corretor-imoveis" class="panel-subview" style="display: none;">
+          <div class="panel-actions-row">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Carteira de Imóveis</h2>
+              <p style="font-size:13px; color:var(--text-muted);">Visualize, edite ou crie novos anúncios na vitrine.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openNewPropertyForm()">
+              <svg style="width:18px; height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Cadastrar Novo Imóvel
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Título do Imóvel</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                  <th>Área</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-properties-body">
+                <!-- Injetado via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUBVIEW C: GESTÃO DE CLIENTES -->
+        <div id="subview-corretor-clientes" class="panel-subview" style="display: none;">
+          <div class="panel-actions-row">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Clientes Cadastrados</h2>
+              <p style="font-size:13px; color:var(--text-muted);">Monitore os dados de contato e interesses de compra/locação de leads.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openNewClientForm()">
+              <svg style="width:18px; height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+              Adicionar Cliente
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome do Cliente</th>
+                  <th>Telefone</th>
+                  <th>E-mail</th>
+                  <th>Notas / Requisitos</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-clients-body">
+                <!-- Injetado via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUBVIEW D: CALENDÁRIO DE AGENDAMENTOS (VISITAS) -->
+        <div id="subview-corretor-agendamentos" class="panel-subview" style="display: none;">
+          <div class="panel-actions-row">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Agenda de Visitas</h2>
+              <p style="font-size:13px; color:var(--text-muted);">Confirme solicitações pendentes de clientes ou agende reuniões de demonstração.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openNewVisitForm()">
+              <svg style="width:18px; height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Agendar Nova Visita
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Imóvel</th>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-visits-body">
+                <!-- Injetado via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUBVIEW E: GESTÃO DE EQUIPE (OUTROS CORRETORES) -->
+        <div id="subview-corretor-equipe" class="panel-subview" style="display: none;">
+          <div class="panel-actions-row">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Corretores Parceiros (Equipe)</h2>
+              <p style="font-size:13px; color:var(--text-muted);">Gerencie as credenciais e fotos dos profissionais integrados à sua imobiliária.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openNewTeamForm()">
+              <svg style="width:18px; height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              Adicionar Corretor
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Corretor</th>
+                  <th>Telefone</th>
+                  <th>E-mail</th>
+                  <th>Endereço do Escritório</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-team-body">
+                <!-- Injetado via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SUBVIEW F: ÁREA PÚBLICA / EXCLUSIVA DO CLIENTE LOGADO -->
+        <div id="subview-cliente-home" class="panel-subview" style="display: none;">
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap:32px;">
+            <div>
+              <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Minhas Visitas Marcadas</h2>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Confira abaixo os agendamentos confirmados e o status das solicitações pendentes.</p>
+              
+              <div id="cliente-visits-timeline" class="appointment-list">
+                <!-- Injetado via JS -->
+              </div>
+            </div>
+
+            <!-- Cartão de Contato com o Corretor do Cliente -->
+            <div class="glass-card realtor-contact-card" style="align-self: start;">
+              <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--secondary);">Corretor de Atendimento</h3>
+              <img id="client-realtor-avatar" class="realtor-contact-avatar" src="" alt="Corretor">
+              <h4 id="client-realtor-name" style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Nome</h4>
+              <p id="client-realtor-phone" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Fone</p>
+              
+              <div style="text-align: left; margin: 16px 0; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Escritório</span>
+                <p id="client-realtor-address" style="font-size: 12px; color: var(--text-main); margin-top:4px;">Endereço escritório</p>
+              </div>
+
+              <!-- Foto do Escritório do Corretor -->
+              <img id="client-realtor-office-img" src="" style="width: 100%; height: 120px; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--border-color); margin-bottom: 20px; display: none;">
+
+              <a id="client-realtor-whatsapp-btn" target="_blank" class="btn btn-success" style="width: 100%;">
+                <svg style="width: 18px; height: 18px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 2c-5.51 0-9.99 4.479-9.99 9.986 0 1.762.459 3.418 1.261 4.867L2 22l5.314-1.395c1.401.764 2.992 1.203 4.717 1.203 5.51 0 9.99-4.479 9.99-9.986 0-5.507-4.48-9.986-9.99-9.986zm6.39 13.961c-.26.732-1.503 1.402-2.073 1.402-.569.061-1.127.305-3.627-.723-3.187-1.31-5.234-4.544-5.394-4.757-.16-.213-1.282-1.704-1.282-3.251 0-1.547.81-2.308 1.099-2.613.29-.305.63-.381.84-.381.21 0 .42.01.6.02.19.01.44-.07.69.52.26.62.88 2.14.96 2.3.08.16.13.35.02.56-.11.21-.25.35-.37.49-.13.14-.26.29-.11.55.15.26.67 1.11 1.44 1.79.99.88 1.83 1.15 2.09 1.28.26.13.41.11.56-.06.15-.17.65-.75.82-.95.17-.2.34-.17.58-.08.24.09 1.54.72 1.8.85.26.13.44.2.5.31.07.11.07.64-.19 1.37z"/></svg>
+                Falar com Meu Corretor
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL 1: FICHA TÉCNICA E AGENDA DE VISITAS     -->
+  <!-- ============================================== -->
+  <div id="property-details-modal" class="modal-overlay">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <div>
+          <span id="modal-prop-code" class="property-code">CÓDIGO</span>
+          <h3 id="modal-prop-title" class="modal-title">Título do Imóvel</h3>
+        </div>
+        <button class="modal-close" onclick="closePropertyModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Galeria Deslizante -->
+        <div class="gallery-main" id="modal-prop-gallery-main">
+          <!-- Injetado via JS -->
+        </div>
+        <div class="gallery-nav" id="modal-prop-gallery-nav">
+          <!-- Injetado via JS -->
+        </div>
+
+        <!-- Detalhes do Layout (Grid 2 colunas) -->
+        <div class="property-info-layout" style="margin-top: 24px;">
+          
+          <div class="property-info-main">
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <span id="modal-prop-type-badge" class="property-badge badge-sale">Venda</span>
+              <span id="modal-prop-area" style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:700;">Área</span>
+              <span id="modal-prop-beds" style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:700;">Quartos</span>
+              <span id="modal-prop-baths" style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:700;">WCs</span>
+            </div>
+
+            <div>
+              <h4 style="font-size:14px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Localização</h4>
+              <p id="modal-prop-address" style="font-size:14px; font-weight:500;">Endereço completo</p>
+            </div>
+
+            <div>
+              <h4 style="font-size:14px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Preço Sugerido</h4>
+              <p id="modal-prop-price" style="font-size:24px; font-weight:800; color:#fff;">R$ 0,00</p>
+            </div>
+
+            <div>
+              <h4 style="font-size:14px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Descrição do Imóvel</h4>
+              <p id="modal-prop-desc" style="font-size:14px; color:var(--text-muted); line-height:1.6; text-align:justify;">Texto descritivo.</p>
+            </div>
+          </div>
+
+          <!-- Coluna Lateral de Leads / Agendamento -->
+          <div class="property-info-sidebar">
+            <div class="glass-card realtor-contact-card">
+              <h3 style="font-size:13px; font-weight:800; color:var(--secondary); text-transform:uppercase; margin-bottom:12px;">Corretor Responsável</h3>
+              <img id="modal-realtor-avatar" class="realtor-contact-avatar" src="" alt="Corretor">
+              <h4 id="modal-realtor-name" style="font-size:15px; font-weight:700; margin-bottom:4px;">Nome Corretor</h4>
+              <p id="modal-realtor-phone" style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Telefone</p>
+              
+              <!-- WhatsApp Redirect Link -->
+              <a id="modal-prop-whatsapp-btn" target="_blank" class="btn btn-success" style="width: 100%; margin-bottom:12px;">
+                <svg style="width: 18px; height: 18px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 2c-5.51 0-9.99 4.479-9.99 9.986 0 1.762.459 3.418 1.261 4.867L2 22l5.314-1.395c1.401.764 2.992 1.203 4.717 1.203 5.51 0 9.99-4.479 9.99-9.986 0-5.507-4.48-9.986-9.99-9.986zm6.39 13.961c-.26.732-1.503 1.402-2.073 1.402-.569.061-1.127.305-3.627-.723-3.187-1.31-5.234-4.544-5.394-4.757-.16-.213-1.282-1.704-1.282-3.251 0-1.547.81-2.308 1.099-2.613.29-.305.63-.381.84-.381.21 0 .42.01.6.02.19.01.44-.07.69.52.26.62.88 2.14.96 2.3.08.16.13.35.02.56-.11.21-.25.35-.37.49-.13.14-.26.29-.11.55.15.26.67 1.11 1.44 1.79.99.88 1.83 1.15 2.09 1.28.26.13.41.11.56-.06.15-.17.65-.75.82-.95.17-.2.34-.17.58-.08.24.09 1.54.72 1.8.85.26.13.44.2.5.31.07.11.07.64-.19 1.37z"/></svg>
+                Conversar no WhatsApp
+              </a>
+            </div>
+
+            <!-- Formulário Público de Solicitação de Visita -->
+            <div class="glass-card" style="padding:16px;">
+              <h4 style="font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:12px;">Solicitar Agendamento</h4>
+              <form id="modal-visit-form">
+                <input type="hidden" id="schedule-prop-code">
+                
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label class="form-label" style="font-size:11px;" for="schedule-client-name">Seu Nome</label>
+                  <input id="schedule-client-name" class="form-input" style="padding:8px 12px; font-size:12px;" type="text" placeholder="Nome Completo" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label class="form-label" style="font-size:11px;" for="schedule-client-phone">Seu WhatsApp</label>
+                  <input id="schedule-client-phone" class="form-input" style="padding:8px 12px; font-size:12px;" type="tel" placeholder="(83) 99999-9999" required>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" style="font-size:11px;" for="schedule-date">Data</label>
+                    <input id="schedule-date" class="form-input" style="padding:8px 12px; font-size:12px;" type="date" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" style="font-size:11px;" for="schedule-time">Horário</label>
+                    <input id="schedule-time" class="form-input" style="padding:8px 12px; font-size:12px;" type="time" required>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label class="form-label" style="font-size:11px;" for="schedule-notes">Observações</label>
+                  <textarea id="schedule-notes" class="form-input" style="padding:8px 12px; font-size:12px; min-height:50px;" placeholder="Deseja acrescentar algo?"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; font-size:12px;">Solicitar e Confirmar</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 2: CADASTRO/EDIÇÃO DE IMÓVEIS (CORRETOR) -->
+  <!-- ============================================== -->
+  <div id="property-modal" class="modal-overlay">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3 id="property-form-title" class="modal-title">Cadastrar Novo Imóvel</h3>
+        <button class="modal-close" onclick="closePropertyFormModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="property-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="prop-code">Código do Imóvel (ex: AP402-CB)</label>
+              <input id="prop-code" class="form-input" type="text" placeholder="AP402-CB" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-title">Título de Anúncio</label>
+              <input id="prop-title" class="form-input" type="text" placeholder="Apartamento Luxo Cabo Branco" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-price">Preço (R$)</label>
+              <input id="prop-price" class="form-input" type="number" step="0.01" placeholder="1200000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-type">Tipo de Negociação</label>
+              <select id="prop-type" class="form-input" required>
+                <option value="sale">Venda</option>
+                <option value="rent">Locação / Aluguel</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-beds">Quantidade de Quartos (Suítes)</label>
+              <input id="prop-beds" class="form-input" type="number" min="0" placeholder="3" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-baths">Quantidade de Banheiros (WCs)</label>
+              <input id="prop-baths" class="form-input" type="number" min="0" placeholder="4" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-area">Área Útil Construída (m²)</label>
+              <input id="prop-area" class="form-input" type="number" min="0" placeholder="150" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prop-address">Endereço Completo</label>
+              <input id="prop-address" class="form-input" type="text" placeholder="Rua Artur Monteiro de Paiva, 100, Bessa, João Pessoa - PB" required>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label" for="prop-desc">Descrição Completa do Imóvel</label>
+              <textarea id="prop-desc" class="form-input" placeholder="Descreva os detalhes de acabamento, diferenciais e diferenciais do condomínio..." required></textarea>
+            </div>
+
+            <!-- Upload de Fotos Dinâmico (Compactação Auto Canvas) -->
+            <div class="form-group full-width">
+              <label class="form-label">Fotos do Imóvel (Até 10 fotos - Carregue ou Tire na Hora)</label>
+              <div class="upload-area" onclick="document.getElementById('property-photo-upload').click()">
+                <div class="upload-icon">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+                <span class="upload-text">Clique aqui para enviar arquivos ou abrir a câmera do celular</span>
+                <input id="property-photo-upload" type="file" accept="image/*" multiple style="display:none;">
+              </div>
+              
+              <!-- Container de miniaturas adicionadas -->
+              <div id="property-upload-preview" class="upload-preview-container">
+                <!-- Injetado via JS -->
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-outline" onclick="closePropertyFormModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Anúncio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 3: CADASTRO/EDIÇÃO DE CLIENTES (CORRETOR) -->
+  <!-- ============================================== -->
+  <div id="client-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="client-form-title" class="modal-title">Adicionar Novo Cliente</h3>
+        <button class="modal-close" onclick="closeClientFormModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="client-form">
+          <div class="form-group">
+            <label class="form-label" for="cli-name">Nome Completo do Cliente</label>
+            <input id="cli-name" class="form-input" type="text" placeholder="Nome Completo" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cli-phone">WhatsApp / Telefone</label>
+            <input id="cli-phone" class="form-input" type="tel" placeholder="(83) 99999-9999" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cli-email">E-mail Cadastrado</label>
+            <input id="cli-email" class="form-input" type="email" placeholder="cliente@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cli-notes">Notas de Interesse / Observações</label>
+            <textarea id="cli-notes" class="form-input" placeholder="Ex: Procura Apartamento de 3 quartos mobiliado no Bessa até R$ 800mil..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-outline" onclick="closeClientFormModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Cadastro</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 4: REGISTRO DE AGENDAMENTOS (CORRETOR)   -->
+  <!-- ============================================== -->
+  <div id="visit-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Agendar Nova Visita</h3>
+        <button class="modal-close" onclick="closeVisitFormModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="visit-form">
+          <div class="form-group">
+            <label class="form-label" for="visit-prop-id">Imóvel da Visita</label>
+            <select id="visit-prop-id" class="form-input" required>
+              <!-- Injetado via JS -->
+            </select>
+          </div>
+
+          <!-- Seleção rápida de clientes ou entrada manual -->
+          <div class="form-group">
+            <label class="form-label" for="visit-client-select">Vincular Cliente Existente (Opcional)</label>
+            <select id="visit-client-select" class="form-input" onchange="handleClientSelectChange()">
+              <!-- Injetado via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="visit-client-name">Nome do Cliente</label>
+            <input id="visit-client-name" class="form-input" type="text" placeholder="Nome Completo do Cliente" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="visit-client-phone">Telefone do Cliente</label>
+            <input id="visit-client-phone" class="form-input" type="tel" placeholder="(83) 99999-9999" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="visit-date">Data da Visita</label>
+              <input id="visit-date" class="form-input" type="date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="visit-time">Horário</label>
+              <input id="visit-time" class="form-input" type="time" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="visit-notes">Observações do Agendamento</label>
+            <textarea id="visit-notes" class="form-input" placeholder="Detalhes, ponto de encontro ou chaves com o porteiro..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-outline" onclick="closeVisitFormModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Agendar Visita</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 5: REGISTRO DE OUTRO CORRETOR DA EQUIPE   -->
+  <!-- ============================================== -->
+  <div id="team-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Cadastrar Novo Corretor</h3>
+        <button class="modal-close" onclick="closeTeamFormModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="team-form">
+          <div class="form-group">
+            <label class="form-label" for="team-name">Nome do Corretor</label>
+            <input id="team-name" class="form-input" type="text" placeholder="Nome Completo do Corretor" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="team-phone">WhatsApp / Celular</label>
+            <input id="team-phone" class="form-input" type="tel" placeholder="(83) 99999-9999" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="team-email">E-mail para Login</label>
+            <input id="team-email" class="form-input" type="email" placeholder="corretor@achei.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="team-office">Endereço do Escritório de Atendimento</label>
+            <input id="team-office" class="form-input" type="text" placeholder="Av. Epitácio Pessoa, 1200, Sala 101, João Pessoa - PB" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="team-pass">Senha Temporária</label>
+            <input id="team-pass" class="form-input" type="password" placeholder="Defina a senha de login" required>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-outline" onclick="closeTeamFormModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrar Corretor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
