@@ -27,44 +27,42 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     const preResultText = document.getElementById('preResultText').value;
     
     const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = '<p style="text-align:center">Processando...</p>';
+    resultsContainer.innerHTML = ''; 
 
     if (isNaN(start) || isNaN(end) || start > end) {
-        resultsContainer.innerHTML = '<p style="color:red; text-align:center">Verifique o intervalo numérico.</p>';
+        alert("Verifique o intervalo numérico.");
         return;
     }
 
     const fragment = document.createDocumentFragment();
 
     for (let i = start; i <= end; i++) {
-        // Composição do valor original: (Prefixo + Contagem + Sufixo)
+        // Composição do que será hasheado
         const rawString = `${prefixComp}${i}${suffixComp}`;
         
-        // Gera o Hash SHA-256 em Base64
+        // Gera o Hash
         const hashBase64 = await generateSHA256Base64(rawString);
         
-        // Concatena o texto do input antes do hash
+        // Formata a saída final (Texto + Hash)
         const finalString = `${preResultText}${hashBase64}`;
 
-        // Criação da interface para cada item
+        // Cria o elemento da lista
         const div = document.createElement('div');
         div.className = 'hash-item';
         
-        const span = document.createElement('span');
-        span.className = 'hash-text';
-        span.textContent = finalString;
+        div.innerHTML = `
+            <div class="index-indicator">${i}</div>
+            <span class="hash-text">${finalString}</span>
+            <button class="copy-btn">Copiar</button>
+        `;
 
-        const btn = document.createElement('button');
-        btn.className = 'copy-btn';
-        btn.textContent = 'Copiar';
-
-        // Lógica de copiar para a área de transferência
+        // Lógica do botão copiar
+        const btn = div.querySelector('.copy-btn');
         btn.addEventListener('click', () => {
             navigator.clipboard.writeText(finalString).then(() => {
                 btn.textContent = 'Copiado!';
                 btn.classList.add('copied');
                 
-                // Reseta o botão após 2 segundos
                 setTimeout(() => {
                     btn.textContent = 'Copiar';
                     btn.classList.remove('copied');
@@ -72,11 +70,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             });
         });
 
-        div.appendChild(span);
-        div.appendChild(btn);
         fragment.appendChild(div);
     }
 
-    resultsContainer.innerHTML = '';
     resultsContainer.appendChild(fragment);
 });

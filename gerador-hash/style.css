@@ -1,5 +1,5 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: #f0f2f5;
     display: flex;
     justify-content: center;
@@ -11,7 +11,7 @@ body {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    max-width: 800px;
+    max-width: 850px;
     width: 100%;
 }
 
@@ -40,13 +40,6 @@ input {
     border: 1px solid #dadce0;
     border-radius: 8px;
     box-sizing: border-box;
-    font-size: 1rem;
-}
-
-input:focus {
-    outline: none;
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
 }
 
 button#generateBtn {
@@ -59,10 +52,7 @@ button#generateBtn {
     cursor: pointer;
     font-size: 1rem;
     font-weight: bold;
-    transition: background 0.3s;
 }
-
-button#generateBtn:hover { background-color: #1557b0; }
 
 .results-container { margin-top: 30px; }
 
@@ -76,10 +66,26 @@ button#generateBtn:hover { background-color: #1557b0; }
     border: 1px solid #e8eaed;
 }
 
+/* Estilo do indicador numérico */
+.index-indicator {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    font-weight: bold;
+    min-width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-size: 0.85rem;
+    border: 1px solid #1a73e8;
+}
+
 .hash-text {
     flex-grow: 1;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
+    font-family: 'Consolas', monospace;
+    font-size: 0.85rem;
     color: #202124;
     word-break: break-all;
     margin-right: 15px;
@@ -94,7 +100,6 @@ button#generateBtn:hover { background-color: #1557b0; }
     cursor: pointer;
     font-size: 0.85rem;
     min-width: 90px;
-    transition: all 0.2s;
 }
 
 .copy-btn.copied {
