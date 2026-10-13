@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório Técnico de Manutenção</title>
+  <style>
+    /* Configurações Globais e de Impressão */
+    @page {
+      size: A4;
+      margin: 15mm 15mm 15mm 15mm;
+    }
+    
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #222222;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Cabeçalho de Identificação */
+    .header-box {
+      border: 2px solid #1a365d;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      background-color: #f7fafc;
+    }
+
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .header-table td {
+      padding: 4px 0;
+      font-size: 9.5pt;
+      vertical-align: top;
+    }
+
+    .header-title {
+      font-size: 11pt;
+      font-weight: bold;
+      color: #1a365d;
+      text-transform: uppercase;
+      border-bottom: 1px solid #cbd5e0;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    /* Títulos do Documento */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .doc-title {
+      font-size: 15pt;
+      font-weight: bold;
+      color: #1a365d;
+      margin: 0 0 6px 0;
+      text-transform: uppercase;
+    }
+
+    .doc-subtitle {
+      font-size: 11pt;
+      font-weight: normal;
+      color: #4a5568;
+      margin: 0;
+    }
+
+    /* Seções */
+    h2 {
+      font-size: 12pt;
+      color: #1a365d;
+      border-bottom: 1.5px solid #1a365d;
+      padding-bottom: 4px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      font-size: 11pt;
+      color: #2b6cb0;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    p, li {
+      text-align: justify;
+      margin-bottom: 8px;
+    }
+
+    ul, ol {
+      margin-top: 4px;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    /* Tabelas */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 10pt;
+    }
+
+    table.data-table th, 
+    table.data-table td {
+      border: 1px solid #cbd5e0;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background-color: #2b6cb0;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    table.data-table tr:nth-child(even) {
+      background-color: #f7fafc;
+    }
+
+    /* Seção de Assinaturas */
+    .signatures-section {
+      margin-top: 40px;
+      page-break-inside: avoid;
+    }
+
+    .signatures-grid {
+      width: 100%;
+      margin-top: 60px;
+      border-collapse: collapse;
+    }
+
+    .signatures-grid td {
+      width: 50%;
+      text-align: center;
+      vertical-align: top;
+      padding: 0 15px;
+    }
+
+    .line {
+      border-top: 1px solid #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .sign-name {
+      font-weight: bold;
+      font-size: 10pt;
+    }
+
+    .sign-info {
+      font-size: 9pt;
+      color: #4a5568;
+    }
+
+    .declaration {
+      font-size: 9pt;
+      font-style: italic;
+      color: #4a5568;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Cabeçalho de Identificação -->
+    <div class="header-box">
+      <div class="header-title">Identificação do Atendimento e Partes</div>
+      <table class="header-table">
+        <tr>
+          <td style="width: 50%;">
+            <strong>PRESTADOR:</strong> [Nome da Empresa / Razão Social]<br>
+            <strong>CNPJ/CPF:</strong> [00.000.000/0001-00]<br>
+            <strong>CONTATO:</strong> [(00) 00000-0000] | [contato@empresa.com.br]
+          </td>
+          <td style="width: 50%;">
+            <strong>CLIENTE:</strong> [Nome do Cliente / Empresa Contratante]<br>
+            <strong>CNPJ/CPF:</strong> [00.000.000/0001-00]<br>
+            <strong>DATA / OS:</strong> 13/10/2026 | O.S. [Nº 0000/2026]<br>
+            <strong>LOCAL:</strong> [Endereço da Unidade da Câmara Fria]
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Título do Relatório -->
+    <div class="doc-header">
+      <h1 class="doc-title">Relatório Técnico de Intervenção e Diagnóstico</h1>
+      <p class="doc-subtitle">Avaliação Operacional da Câmara Frigorífica e Proposta de Adequação de Engenharia</p>
+    </div>
+
+    <!-- Diagnóstico -->
+    <h2>1. Diagnóstico e Identificação de Problemas</h2>
+    <p>Durante a visita técnica programada para a execução dos serviços de reparo e manutenção na unidade frigorífica, constatou-se alteração significativa do cenário operacional em relação ao levantamento técnico prévio. Foram identificadas as seguintes inconformidades:</p>
+    
+    <ol>
+      <li><strong>Despressurização e Falha de Retenção do Fluido Refrigerante:</strong> A unidade condensadora apresentou degradação na estanqueidade interna (comprometimento do retentor/válvula do compressor), inviabilizando a manutenção adequada de vácuo e a retenção de gás segundo os parâmetros projetados.</li>
+      <li><strong>Ruído Mecânico Elevado:</strong> Aumento acentuado da pressão acústica e vibração na unidade condensadora, sinalizando desgaste mecânico interno.</li>
+      <li><strong>Inconformidade de Parâmetros Elétrico-Operacionais:</strong> Alteração não autorizada no <em>setpoint</em> do controlador de temperatura.</li>
+      <li><strong>Instabilidade nas Conexões Elétricas:</strong> Cabos e condutores com fixação inadequada (folgas nos bornes e conectores), oferecendo risco de aquecimento pontual e queda de fase.</li>
+    </ol>
+
+    <!-- Análise Técnica -->
+    <h2>2. Análise Técnica e Opcionais de Orçamento Complementar</h2>
+    <p>Para a recomposição da capacidade frigorífica do equipamento, foram executados os ajustes elétricos e operacionais emergenciais possíveis na data. Contudo, para a solução definitiva da avaria no compressor, são propostas duas abordagens distintas de intervenção:</p>
+
+    <h3>2.1. Abordagens de Reparo na Condensadora</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Parâmetro</th>
+          <th>Opção A: Substituição Integral do Compressor</th>
+          <th>Opção B: Instalação de Solenóide de Sucção (Sobrevida)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Escopo Técnico</strong></td>
+          <td>Substituição da unidade de compressão por um componente novo original de fábrica.</td>
+          <td>Instalação de válvula solenóide suplementar na linha de baixa pressão (sucção).</td>
+        </tr>
+        <tr>
+          <td><strong>Objetivo</strong></td>
+          <td>Restabelecer o desempenho nominal original de fábrica.</td>
+          <td>Retomar o controle de fluxo/retenção, assumindo o papel do retentor interno avariado.</td>
+        </tr>
+        <tr>
+          <td><strong>Impacto Financeiro</strong></td>
+          <td>Investimento de maior porte.</td>
+          <td>Investimento substancialmente reduzido.</td>
+        </tr>
+        <tr>
+          <td><strong>Vida Útil Estimada</strong></td>
+          <td>Longa (ciclo de vida de componente novo).</td>
+          <td>Média/Extensão do ciclo atual (sobrevida operacional).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>2.2. Recomendação de Sistema de Proteção e Travas de Segurança (Módulo Adicional)</h3>
+    <p>Adicionalmente, sugere-se a implementação de um <strong>Sistema Integrado de Proteção e Monitoramento de Saúde do Equipamento</strong>:</p>
+    <ul>
+      <li><strong>Sinalização Amarela (Alerta Prévio):</strong> Acendimento de luz indicadora ao primeiro sinal de variação anômala nos parâmetros de pressão ou temperatura, antes do surgimento da avaria grave.</li>
+      <li><strong>Sistema de Desarme Automático (Proteção Crítica):</strong> Atuação automática de interrupção de alimentação elétrica ao atingir os limites críticos de segurança, prevenindo a queima mecânica/elétrica do compressor.</li>
+      <li><strong>Retorno do Investimento:</strong> Redução substancial do tempo de inatividade (<em>downtime</em>) e diminuição do custo de manutenções corretivas emergenciais.</li>
+    </ul>
+
+    <!-- Conclusão -->
+    <h2>3. Conclusão</h2>
+    <p>A intervenção imediata corrigiu as falhas de conexão elétrica e a configuração dos parâmetros do controlador. Todavia, a restauração plena da capacidade de retenção de fluido e estanqueidade da câmara fria depende da aprovação de um dos caminhos orçamentários propostos (<strong>Opção A</strong> ou <strong>Opção B</strong>).</p>
+    <p>Recomenda-se priorizar a instalação do <strong>Sistema de Travas de Segurança</strong>, garantindo maior durabilidade à planta de refrigeração e evitando falhas catastróficas no sistema elétrico e mecânico.</p>
+
+    <!-- Assinaturas -->
+    <div class="signatures-section">
+      <p class="declaration">Declaro que as informações acima refletem o exato estado operacional do equipamento na data do atendimento técnico.</p>
+      
+      <table class="signatures-grid">
+        <tr>
+          <td>
+            <div class="line"></div>
+            <div class="sign-name">[Nome do Técnico / Responsável]</div>
+            <div class="sign-info">CPF/CREA/CFT: [000.000.000-00]</div>
+            <div class="sign-info">Técnico Responsável</div>
+          </td>
+          <td>
+            <div class="line"></div>
+            <div class="sign-name">[Nome do Responsável do Cliente]</div>
+            <div class="sign-info">CPF/CNPJ: [000.000.000-00]</div>
+            <div class="sign-info">Cliente Contratante</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>
+
