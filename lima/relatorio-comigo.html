@@ -3,72 +3,91 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Relatório Técnico de Manutenção</title>
 
     <style>
+      /* ======================================================
+   CONFIGURAÇÕES GERAIS
+   ====================================================== */
+
       @page {
-        size: A4;
+        size: A4 portrait;
         margin: 15mm;
+      }
+
+      :root {
+        --azul-escuro: #1a365d;
+        --azul: #2b6cb0;
+        --cinza-claro: #f7fafc;
+        --cinza-borda: #cbd5e0;
+        --texto: #222222;
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
       body {
+        margin: 0;
+        padding: 0;
+        background: #edf0f4;
+        color: var(--texto);
         font-family: Arial, Helvetica, sans-serif;
         font-size: 11pt;
         line-height: 1.5;
-        color: #222222;
-        background: #edf0f4;
-        margin: 0;
-        padding: 0;
       }
 
-      /* BARRA DE FERRAMENTAS */
+      /* ======================================================
+   BARRA DE FERRAMENTAS
+   ====================================================== */
 
       .toolbar {
+        width: calc(100% - 30px);
         max-width: 800px;
         margin: 20px auto;
         padding: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
         background: #ffffff;
         border: 1px solid #d0d7e2;
         border-radius: 6px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
       }
 
       .toolbar button {
-        padding: 11px 16px;
+        padding: 10px 15px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        font-family: Arial, Helvetica, sans-serif;
         font-size: 10pt;
         font-weight: bold;
       }
 
       .btn-save {
-        background: #1a365d;
         color: #ffffff;
-      }
-
-      .btn-print {
-        background: #2f855a;
-        color: #ffffff;
+        background: var(--azul-escuro);
       }
 
       .btn-restore {
-        background: #e2e8f0;
         color: #2d3748;
+        background: #e2e8f0;
       }
 
-      .btn-export {
-        background: #2b6cb0;
+      .btn-print {
         color: #ffffff;
+        background: #2f855a;
+      }
+
+      .btn-download {
+        color: #ffffff;
+        background: var(--azul);
       }
 
       .toolbar button:hover {
@@ -76,15 +95,17 @@
       }
 
       #save-status {
-        font-size: 9pt;
-        color: #4a5568;
         margin-left: auto;
+        color: #4a5568;
+        font-size: 9pt;
       }
 
-      /* DOCUMENTO */
+      /* ======================================================
+   DOCUMENTO
+   ====================================================== */
 
       .container {
-        width: 100%;
+        width: calc(100% - 30px);
         max-width: 800px;
         margin: 0 auto 30px;
         padding: 30px;
@@ -92,7 +113,9 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
       }
 
-      /* CAMPOS EDITÁVEIS */
+      /* ======================================================
+   EDIÇÃO
+   ====================================================== */
 
       [contenteditable="true"] {
         outline: none;
@@ -108,221 +131,456 @@
         background-color: #ebf8ff;
       }
 
-      /* CABEÇALHO DE IDENTIFICAÇÃO */
+      /* ======================================================
+   IDENTIFICAÇÃO DO ATENDIMENTO
+   ====================================================== */
 
       .header-box {
-        border: 2px solid #1a365d;
-        border-radius: 4px;
-        padding: 12px 16px;
         margin-bottom: 24px;
-        background-color: #f7fafc;
+        padding: 12px 16px;
+        border: 2px solid var(--azul-escuro);
+        border-radius: 4px;
+        background: var(--cinza-claro);
+      }
+
+      .header-title {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--cinza-borda);
+        color: var(--azul-escuro);
+        font-size: 11pt;
+        font-weight: bold;
+        text-transform: uppercase;
       }
 
       .header-table {
         width: 100%;
+        table-layout: fixed;
         border-collapse: collapse;
       }
 
       .header-table td {
+        width: 50%;
         padding: 4px 8px 4px 0;
-        font-size: 9.5pt;
         vertical-align: top;
+        font-size: 9.5pt;
+        overflow-wrap: anywhere;
       }
 
-      .header-title {
-        font-size: 11pt;
-        font-weight: bold;
-        color: #1a365d;
-        text-transform: uppercase;
-        border-bottom: 1px solid #cbd5e0;
-        padding-bottom: 6px;
-        margin-bottom: 8px;
-      }
-
-      /* TÍTULO */
+      /* ======================================================
+   TÍTULO DO RELATÓRIO
+   ====================================================== */
 
       .doc-header {
-        text-align: center;
         margin-bottom: 24px;
+        text-align: center;
       }
 
       .doc-title {
+        margin: 0 0 6px;
+        color: var(--azul-escuro);
         font-size: 15pt;
         font-weight: bold;
-        color: #1a365d;
-        margin: 0 0 6px;
         text-transform: uppercase;
       }
 
       .doc-subtitle {
+        margin: 0;
+        color: #4a5568;
         font-size: 11pt;
         font-weight: normal;
-        color: #4a5568;
-        margin: 0;
       }
 
-      /* SEÇÕES */
+      /* ======================================================
+   TÍTULOS E SEÇÕES
+   ====================================================== */
 
       h2 {
-        font-size: 12pt;
-        color: #1a365d;
-        border-bottom: 1.5px solid #1a365d;
-        padding-bottom: 4px;
         margin-top: 20px;
         margin-bottom: 12px;
+        padding-bottom: 4px;
+        border-bottom: 1.5px solid var(--azul-escuro);
+        color: var(--azul-escuro);
+        font-size: 12pt;
         text-transform: uppercase;
       }
 
       h3 {
-        font-size: 11pt;
-        color: #2b6cb0;
         margin-top: 14px;
         margin-bottom: 6px;
-      }
-
-      p,
-      li {
-        text-align: justify;
-        margin-bottom: 8px;
+        color: var(--azul);
+        font-size: 11pt;
       }
 
       p {
         margin-top: 0;
+        margin-bottom: 8px;
+        text-align: justify;
       }
 
       ul,
       ol {
         margin-top: 4px;
+        margin-bottom: 12px;
         padding-left: 22px;
       }
 
       li {
         margin-bottom: 6px;
+        text-align: justify;
       }
 
-      /* TABELAS */
+      /* ======================================================
+   TABELA TÉCNICA
+   ====================================================== */
 
       table.data-table {
         width: 100%;
-        border-collapse: collapse;
         margin: 14px 0;
+        border-collapse: collapse;
+        table-layout: fixed;
         font-size: 10pt;
       }
 
-      table.data-table th,
-      table.data-table td {
-        border: 1px solid #cbd5e0;
+      .data-table th,
+      .data-table td {
         padding: 8px 10px;
+        border: 1px solid var(--cinza-borda);
         text-align: left;
         vertical-align: top;
         overflow-wrap: anywhere;
       }
 
-      table.data-table th {
-        background-color: #2b6cb0;
+      .data-table th {
         color: #ffffff;
+        background: var(--azul);
         font-weight: bold;
       }
 
-      table.data-table tbody tr:nth-child(even) {
-        background-color: #f7fafc;
+      .data-table tbody tr:nth-child(even) {
+        background: var(--cinza-claro);
       }
 
-      /* ASSINATURAS */
+      /* Larguras das três colunas */
+
+      .data-table th:nth-child(1),
+      .data-table td:nth-child(1) {
+        width: 18%;
+      }
+
+      .data-table th:nth-child(2),
+      .data-table td:nth-child(2) {
+        width: 41%;
+      }
+
+      .data-table th:nth-child(3),
+      .data-table td:nth-child(3) {
+        width: 41%;
+      }
+
+      /* ======================================================
+   ASSINATURAS
+   ====================================================== */
 
       .signatures-section {
         margin-top: 40px;
-        page-break-inside: avoid;
+      }
+
+      .declaration {
+        margin-bottom: 20px;
+        color: #4a5568;
+        font-size: 9pt;
+        font-style: italic;
+        text-align: center;
       }
 
       .signatures-grid {
         width: 100%;
         margin-top: 60px;
         border-collapse: collapse;
+        table-layout: fixed;
       }
 
       .signatures-grid td {
         width: 50%;
+        padding: 0 12px;
         text-align: center;
         vertical-align: top;
-        padding: 0 15px;
         overflow-wrap: anywhere;
       }
 
       .line {
-        border-top: 1px solid #2d3748;
         margin-bottom: 8px;
+        border-top: 1px solid #2d3748;
       }
 
       .sign-name {
-        font-weight: bold;
         font-size: 10pt;
+        font-weight: bold;
       }
 
       .sign-info {
-        font-size: 9pt;
         color: #4a5568;
+        font-size: 9pt;
       }
 
-      .declaration {
-        font-size: 9pt;
-        font-style: italic;
-        color: #4a5568;
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      /* IMPRESSÃO */
+      /* ======================================================
+   IMPRESSÃO
+   ====================================================== */
 
       @media print {
         html,
         body {
+          width: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
           background: #ffffff !important;
-          margin: 0;
-          padding: 0;
-          font-size: 10pt;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
+          color: #222222 !important;
+          font-family: Arial, Helvetica, sans-serif !important;
+          font-size: 10pt !important;
+          line-height: 1.45 !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
 
-        .toolbar {
+        /* Oculta controles */
+
+        .toolbar,
+        .toolbar *,
+        button,
+        #save-status {
           display: none !important;
+          visibility: hidden !important;
         }
+
+        /* Área imprimível */
 
         .container {
-          width: 100%;
-          max-width: none;
-          margin: 0;
-          padding: 0;
-          box-shadow: none;
+          display: block !important;
+          width: 100% !important;
+          max-width: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+          background: #ffffff !important;
         }
 
-        [contenteditable="true"] {
-          outline: none !important;
-          background: transparent !important;
+        /* Mantém a aparência do cabeçalho */
+
+        .header-box {
+          display: block !important;
+          margin-bottom: 20px !important;
+          padding: 10px 12px !important;
+          border: 2px solid #1a365d !important;
+          border-radius: 4px !important;
+          background-color: #f7fafc !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+
+          break-inside: avoid;
+          page-break-inside: avoid;
         }
 
-        h1,
-        h2,
-        h3 {
+        .header-title {
+          color: #1a365d !important;
+          border-bottom: 1px solid #cbd5e0 !important;
+          font-size: 10pt !important;
+        }
+
+        .header-table {
+          display: table !important;
+          width: 100% !important;
+          table-layout: fixed !important;
+          border-collapse: collapse !important;
+        }
+
+        .header-table tr {
+          display: table-row !important;
+        }
+
+        .header-table td {
+          display: table-cell !important;
+          width: 50% !important;
+          padding: 3px 5px 3px 0 !important;
+          font-size: 8.5pt !important;
+          vertical-align: top !important;
+          overflow-wrap: anywhere !important;
+        }
+
+        /* Título */
+
+        .doc-header {
+          display: block !important;
+          margin-bottom: 20px !important;
+          text-align: center !important;
+        }
+
+        .doc-title {
+          color: #1a365d !important;
+          font-size: 15pt !important;
+          text-align: center !important;
+        }
+
+        .doc-subtitle {
+          color: #4a5568 !important;
+          font-size: 10pt !important;
+          text-align: center !important;
+        }
+
+        /* Seções */
+
+        h2 {
+          margin-top: 17px !important;
+          margin-bottom: 10px !important;
+          padding-bottom: 4px !important;
+          border-bottom: 1.5px solid #1a365d !important;
+          color: #1a365d !important;
+          font-size: 11.5pt !important;
+
+          break-after: avoid;
           page-break-after: avoid;
         }
 
-        table {
-          page-break-inside: auto;
+        h3 {
+          margin-top: 12px !important;
+          color: #2b6cb0 !important;
+          font-size: 10.5pt !important;
+
+          break-after: avoid;
+          page-break-after: avoid;
         }
 
-        tr {
+        p,
+        li {
+          color: #222222 !important;
+          font-size: 9.5pt !important;
+          text-align: justify !important;
+          orphans: 3;
+          widows: 3;
+        }
+
+        /* Tabela: preservar cabeçalho e cores */
+
+        table.data-table {
+          display: table !important;
+          width: 100% !important;
+          table-layout: fixed !important;
+          border-collapse: collapse !important;
+          margin: 12px 0 !important;
+          font-size: 8.2pt !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .data-table thead {
+          display: table-header-group !important;
+        }
+
+        .data-table tbody {
+          display: table-row-group !important;
+        }
+
+        .data-table tr {
+          break-inside: avoid;
           page-break-inside: avoid;
         }
 
-        .header-box,
+        .data-table th,
+        .data-table td {
+          padding: 6px 5px !important;
+          border: 1px solid #cbd5e0 !important;
+          text-align: left !important;
+          vertical-align: top !important;
+          overflow-wrap: anywhere !important;
+          word-break: normal !important;
+        }
+
+        .data-table th {
+          color: #ffffff !important;
+          background-color: #2b6cb0 !important;
+          font-weight: bold !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+          background-color: #f7fafc !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) {
+          width: 18% !important;
+        }
+
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) {
+          width: 41% !important;
+        }
+
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) {
+          width: 41% !important;
+        }
+
+        /* Assinaturas */
+
         .signatures-section {
-          page-break-inside: avoid;
+          margin-top: 30px !important;
         }
 
-        .header-box,
-        table.data-table th {
+        .signatures-grid {
+          display: table !important;
+          width: 100% !important;
+          table-layout: fixed !important;
+          margin-top: 45px !important;
+          border-collapse: collapse !important;
+        }
+
+        .signatures-grid tr {
+          display: table-row !important;
+        }
+
+        .signatures-grid td {
+          display: table-cell !important;
+          width: 50% !important;
+          padding: 0 10px !important;
+          text-align: center !important;
+          vertical-align: top !important;
+        }
+
+        .line {
+          border-top: 1px solid #2d3748 !important;
+        }
+
+        .sign-name {
+          font-size: 9pt !important;
+        }
+
+        .sign-info,
+        .declaration {
+          color: #4a5568 !important;
+          font-size: 8.5pt !important;
+        }
+
+        /* Remove indicadores de edição */
+
+        [contenteditable="true"] {
+          outline: none !important;
+          box-shadow: none !important;
+          background: transparent !important;
+        }
+
+        /* Preserva as cores do documento */
+
+        * {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
@@ -331,7 +589,9 @@
   </head>
 
   <body>
-    <!-- BARRA DE FERRAMENTAS -->
+    <!-- ======================================================
+     FERRAMENTAS
+     ====================================================== -->
 
     <div class="toolbar">
       <button type="button" class="btn-save" onclick="salvarRelatorio()">
@@ -346,7 +606,7 @@
         🖨️ Imprimir / PDF
       </button>
 
-      <button type="button" class="btn-export" onclick="baixarHTML()">
+      <button type="button" class="btn-download" onclick="baixarHTML()">
         📥 Baixar HTML atualizado
       </button>
 
@@ -355,62 +615,63 @@
       </span>
     </div>
 
-    <!-- DOCUMENTO EDITÁVEL -->
+    <!-- ======================================================
+     RELATÓRIO
+     ====================================================== -->
 
     <main class="container" id="relatorio">
-      <!-- IDENTIFICAÇÃO -->
-
       <div class="header-box">
         <div class="header-title" contenteditable="true">
           Identificação do Atendimento e Partes
         </div>
 
         <table class="header-table">
-          <tr>
-            <td style="width: 50%">
-              <strong>PRESTADOR:</strong>
-              <span contenteditable="true"
-                >[Nome da Empresa / Razão Social]</span
-              >
-              <br />
+          <tbody>
+            <tr>
+              <td>
+                <strong>PRESTADOR:</strong>
+                <span contenteditable="true"
+                  >[Nome da Empresa / Razão Social]</span
+                >
+                <br />
 
-              <strong>CNPJ/CPF:</strong>
-              <span contenteditable="true">[00.000.000/0001-00]</span>
-              <br />
+                <strong>CNPJ/CPF:</strong>
+                <span contenteditable="true">[00.000.000/0001-00]</span>
+                <br />
 
-              <strong>CONTATO:</strong>
-              <span contenteditable="true">[(00) 00000-0000]</span>
-              |
-              <span contenteditable="true">[contato@empresa.com.br]</span>
-            </td>
+                <strong>CONTATO:</strong>
+                <span contenteditable="true">[(00) 00000-0000]</span>
+                <br />
 
-            <td style="width: 50%">
-              <strong>CLIENTE:</strong>
-              <span contenteditable="true"
-                >[Nome do Cliente / Empresa Contratante]</span
-              >
-              <br />
+                <span contenteditable="true">[contato@empresa.com.br]</span>
+              </td>
 
-              <strong>CNPJ/CPF:</strong>
-              <span contenteditable="true">[00.000.000/0001-00]</span>
-              <br />
+              <td>
+                <strong>CLIENTE:</strong>
+                <span contenteditable="true"
+                  >[Nome do Cliente / Empresa Contratante]</span
+                >
+                <br />
 
-              <strong>DATA / OS:</strong>
-              <span contenteditable="true"
-                >13/10/2026 | O.S. [Nº 0000/2026]</span
-              >
-              <br />
+                <strong>CNPJ/CPF:</strong>
+                <span contenteditable="true">[00.000.000/0001-00]</span>
+                <br />
 
-              <strong>LOCAL:</strong>
-              <span contenteditable="true"
-                >[Endereço da Unidade da Câmara Fria]</span
-              >
-            </td>
-          </tr>
+                <strong>DATA / OS:</strong>
+                <span contenteditable="true"
+                  >13/10/2026 | O.S. [Nº 0000/2026]</span
+                >
+                <br />
+
+                <strong>LOCAL:</strong>
+                <span contenteditable="true"
+                  >[Endereço da Unidade da Câmara Fria]</span
+                >
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
-
-      <!-- TÍTULO -->
 
       <div class="doc-header">
         <h1 class="doc-title" contenteditable="true">
@@ -422,8 +683,6 @@
           Engenharia
         </p>
       </div>
-
-      <!-- 1. DIAGNÓSTICO -->
 
       <h2 contenteditable="true">
         1. Diagnóstico e Identificação de Problemas
@@ -466,8 +725,6 @@
           conectores), oferecendo risco de aquecimento pontual e queda de fase.
         </li>
       </ol>
-
-      <!-- 2. ANÁLISE TÉCNICA -->
 
       <h2 contenteditable="true">
         2. Análise Técnica e Opções de Orçamento Complementar
@@ -539,8 +796,6 @@
         </tbody>
       </table>
 
-      <!-- 2.2. SISTEMA DE PROTEÇÃO -->
-
       <h3 contenteditable="true">
         2.2. Recomendação de Sistema de Proteção e Travas de Segurança (Módulo
         Adicional)
@@ -576,8 +831,6 @@
         </li>
       </ul>
 
-      <!-- 3. CONCLUSÃO -->
-
       <h2 contenteditable="true">3. Conclusão</h2>
 
       <p contenteditable="true">
@@ -597,8 +850,6 @@
         sistema elétrico e mecânico.
       </p>
 
-      <!-- ASSINATURAS -->
-
       <div class="signatures-section">
         <p class="declaration" contenteditable="true">
           Declaro que as informações acima refletem o exato estado operacional
@@ -606,39 +857,41 @@
         </p>
 
         <table class="signatures-grid">
-          <tr>
-            <td>
-              <div class="line"></div>
+          <tbody>
+            <tr>
+              <td>
+                <div class="line"></div>
 
-              <div class="sign-name" contenteditable="true">
-                [Nome do Técnico / Responsável]
-              </div>
+                <div class="sign-name" contenteditable="true">
+                  [Nome do Técnico / Responsável]
+                </div>
 
-              <div class="sign-info" contenteditable="true">
-                CPF/CREA/CFT: [000.000.000-00]
-              </div>
+                <div class="sign-info" contenteditable="true">
+                  CPF/CREA/CFT: [000.000.000-00]
+                </div>
 
-              <div class="sign-info" contenteditable="true">
-                Técnico Responsável
-              </div>
-            </td>
+                <div class="sign-info" contenteditable="true">
+                  Técnico Responsável
+                </div>
+              </td>
 
-            <td>
-              <div class="line"></div>
+              <td>
+                <div class="line"></div>
 
-              <div class="sign-name" contenteditable="true">
-                [Nome do Responsável do Cliente]
-              </div>
+                <div class="sign-name" contenteditable="true">
+                  [Nome do Responsável do Cliente]
+                </div>
 
-              <div class="sign-info" contenteditable="true">
-                CPF/CNPJ: [000.000.000-00]
-              </div>
+                <div class="sign-info" contenteditable="true">
+                  CPF/CNPJ: [000.000.000-00]
+                </div>
 
-              <div class="sign-info" contenteditable="true">
-                Cliente Contratante
-              </div>
-            </td>
-          </tr>
+                <div class="sign-info" contenteditable="true">
+                  Cliente Contratante
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </main>
@@ -647,7 +900,7 @@
       (function () {
         "use strict";
 
-        const CHAVE = "relatorio_manutencao_camara_fria_v2";
+        const STORAGE_KEY = "relatorio_manutencao_camara_fria_v3";
 
         const documento = document.getElementById("relatorio");
         const status = document.getElementById("save-status");
@@ -659,32 +912,31 @@
           status.textContent = mensagem;
         }
 
-        function marcarAlteracao() {
-          if (carregando) return;
-
-          alteracoesPendentes = true;
-          informar("Alterações não salvas");
-        }
-
         function salvarRelatorio() {
           try {
-            localStorage.setItem(CHAVE, documento.innerHTML);
+            localStorage.setItem(STORAGE_KEY, documento.innerHTML);
 
             alteracoesPendentes = false;
 
             informar("Salvo às " + new Date().toLocaleTimeString("pt-BR"));
           } catch (erro) {
-            console.error(erro);
-
+            console.error("Falha ao salvar:", erro);
             informar("Erro ao salvar. Verifique o armazenamento do navegador.");
           }
         }
 
         function restaurarRelatorio() {
-          const salvo = localStorage.getItem(CHAVE);
+          let conteudo;
 
-          if (!salvo) {
-            informar("Nenhuma versão salva encontrada");
+          try {
+            conteudo = localStorage.getItem(STORAGE_KEY);
+          } catch (erro) {
+            informar("Não foi possível acessar os dados salvos.");
+            return;
+          }
+
+          if (!conteudo) {
+            informar("Nenhuma versão salva encontrada.");
             return;
           }
 
@@ -698,36 +950,55 @@
           }
 
           carregando = true;
-          documento.innerHTML = salvo;
+          documento.innerHTML = conteudo;
           carregando = false;
 
           alteracoesPendentes = false;
-          informar("Última versão salva restaurada");
+          informar("Última versão salva restaurada.");
         }
 
         function baixarHTML() {
           try {
-            const clone = document.documentElement.cloneNode(true);
+            /*
+             * Cria uma cópia do documento com o conteúdo atual.
+             * O arquivo baixado abre com as alterações incorporadas.
+             */
 
-            const barra = clone.querySelector(".toolbar");
+            const copia = document.documentElement.cloneNode(true);
 
-            if (barra) {
-              barra.remove();
+            const areaOriginal = copia.querySelector("#relatorio");
+            const barra = copia.querySelector(".toolbar");
+            const statusCopia = copia.querySelector("#save-status");
+
+            if (areaOriginal) {
+              areaOriginal.innerHTML = documento.innerHTML;
             }
 
-            const area = clone.querySelector("#relatorio");
+            /*
+             * Remove a barra de ferramentas da cópia?
+             *
+             * Não: ela é mantida no HTML baixado para permitir
+             * continuar editando o documento posteriormente.
+             */
 
-            if (area) {
-              area.innerHTML = documento.innerHTML;
+            if (statusCopia) {
+              statusCopia.textContent = "Documento pronto para editar.";
             }
 
-            const conteudo = "<!DOCTYPE html>\n" + clone.outerHTML;
+            /*
+             * Remove atributos temporários de foco que possam
+             * existir durante a edição.
+             */
 
-            const arquivo = new Blob([conteudo], {
-              type: "text/html;charset=utf-8",
+            copia.querySelectorAll("[contenteditable]").forEach(function (el) {
+              el.removeAttribute("spellcheck");
             });
 
-            const url = URL.createObjectURL(arquivo);
+            const html = "<!DOCTYPE html>\n" + copia.outerHTML;
+
+            const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+
+            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
 
             link.href = url;
@@ -737,16 +1008,31 @@
             link.click();
             link.remove();
 
-            URL.revokeObjectURL(url);
+            setTimeout(function () {
+              URL.revokeObjectURL(url);
+            }, 1000);
 
-            informar("Arquivo HTML atualizado baixado");
+            informar("HTML atualizado baixado.");
           } catch (erro) {
-            console.error(erro);
-            informar("Não foi possível gerar o arquivo HTML");
+            console.error("Falha ao gerar HTML:", erro);
+            informar("Não foi possível baixar o HTML.");
           }
         }
 
-        documento.addEventListener("input", marcarAlteracao);
+        /*
+         * Edição: registra alterações pendentes.
+         */
+
+        documento.addEventListener("input", function () {
+          if (carregando) return;
+
+          alteracoesPendentes = true;
+          informar("Alterações não salvas.");
+        });
+
+        /*
+         * Atalho Ctrl+S ou Command+S.
+         */
 
         document.addEventListener("keydown", function (evento) {
           if (
@@ -758,6 +1044,10 @@
           }
         });
 
+        /*
+         * Aviso ao sair sem salvar.
+         */
+
         window.addEventListener("beforeunload", function (evento) {
           if (alteracoesPendentes) {
             evento.preventDefault();
@@ -765,34 +1055,35 @@
           }
         });
 
+        /*
+         * Disponibiliza as funções aos botões.
+         */
+
         window.salvarRelatorio = salvarRelatorio;
         window.restaurarRelatorio = restaurarRelatorio;
         window.baixarHTML = baixarHTML;
 
-        /* Recuperação da última versão salva */
+        /*
+         * Recupera a última versão salva, quando existir.
+         */
 
         try {
-          const salvo = localStorage.getItem(CHAVE);
+          const salvo = localStorage.getItem(STORAGE_KEY);
 
-          if (salvo) {
-            if (
-              confirm(
-                "Existe uma versão salva deste relatório. " +
-                  "Deseja carregá-la?",
-              )
-            ) {
-              carregando = true;
-              documento.innerHTML = salvo;
-              carregando = false;
+          if (
+            salvo &&
+            confirm(
+              "Existe uma versão salva deste relatório. Deseja carregá-la?",
+            )
+          ) {
+            carregando = true;
+            documento.innerHTML = salvo;
+            carregando = false;
 
-              informar("Última versão salva carregada");
-            } else {
-              informar("Documento original carregado");
-            }
+            informar("Última versão salva carregada.");
           }
         } catch (erro) {
-          console.error(erro);
-          informar("Armazenamento local indisponível");
+          console.warn("Não foi possível recuperar dados salvos.", erro);
         }
       })();
     </script>
